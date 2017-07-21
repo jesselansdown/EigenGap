@@ -56,12 +56,18 @@ Obj EigenEigenvalues(Obj self, Obj mat)
 
   Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
   SET_LEN_PLIST(eigenvalues, dimension);
-  for (i = 0; i < dimension; i = i+1)
-    SET_ELM_PLIST(eigenvalues, i+1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+  for (i = 0; i < dimension; i = i+1){
+    Obj complex_value = NEW_PLIST(T_PLIST, 2);
+    SET_LEN_PLIST(complex_value, 2);
+    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
+    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
+  }
 
   return eigenvalues;
 
 }
+
 
 Obj TestCommandWithParams(Obj self, Obj param, Obj param2)
 {
