@@ -20,30 +20,35 @@ extern "C" {
 }
 
 
-Obj TestCommand(Obj self, Obj row_val)
+Obj TestCommand(Obj self, Obj mat)
 {
 
-  MatrixXd m = MatrixXd::Random(3,3);
-  m = (m + MatrixXd::Constant(3,3,1.2)) * 50;
-  cout << "m =" << endl << m << endl;
-  VectorXd v(3);
-  v << 1, 2, 3;
-  cout << "m * v =" << endl << m * v << endl;
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
-  int rows = INT_INTOBJ(row_val);
-  int cols = INT_INTOBJ(row_val);
+  int dimension = LEN_PLIST(mat);
 
-  MatrixXd A(rows, cols);
-  A(0,0) = 1;
-  A(0,1) = -3;
-  A(0,2) = 3;
-  A(1,0) = 3;
-  A(1,1) = -5;
-  A(1,2) = 3;
-  A(2,0) = 6;
-  A(2,1) = -6;
-  A(2,2) = 4;
-  cout << "Here is a random 6x6 matrix, A:" << endl << A << endl << endl;
+  MatrixXd A(dimension, dimension);
+  int i, j;
+
+  for (i = 0; i < dimension; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < dimension; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_INTOBJ(entry_ij) )
+          A(i, j) = INT_INTOBJ(entry_ij);
+        else if ( IS_MACFLOAT(entry_ij) )
+          A(i, j) = VAL_MACFLOAT(entry_ij);
+        else
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
+    }
+  }
+
+  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
 
   EigenSolver<MatrixXd> es(A);
   cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
@@ -69,7 +74,7 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommand, 1, "row_val"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommand, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommandWithParams, 2, "param, param2"),
 
 	{ 0 } /* Finish with an empty entry */
