@@ -50,10 +50,7 @@ dnl ## Detect pointer size to distinguish 32 and 64 bit builds
 dnl ##
 AC_CHECK_SIZEOF([void **])
 
-AC_ARG_WITH([eigen],
-    [AC_HELP_STRING([--with-eigen=<path>], [specify root of EIGEN installation])],
-    [EIGEN="$with_eigen"],
-)
+EIGEN="./eigen/"
 EIGEN_CPPFLAGS="-I$EIGEN"
 EIGEN_LDPATH="$EIGEN"
 EIGEN_LDFLAGS="-L$EIGEN_LDPATH"
