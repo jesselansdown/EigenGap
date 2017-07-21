@@ -51,8 +51,15 @@ Obj EigenEigenvalues(Obj self, Obj mat)
 //  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
 
   EigenSolver<MatrixXd> es(A);
-  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
 //  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
+  Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(eigenvalues, dimension);
+  for (i = 0; i < dimension; i = i+1)
+    SET_ELM_PLIST(eigenvalues, i+1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+
+  return eigenvalues;
 
 }
 
@@ -73,7 +80,7 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenValues, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommandWithParams, 2, "param, param2"),
 
 	{ 0 } /* Finish with an empty entry */
