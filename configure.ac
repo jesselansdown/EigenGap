@@ -1,5 +1,5 @@
 #
-# EigenGap: Use the Eigen C++ library within GAP
+# EigenGap: Use the Eigen C++ Library within GAP
 #
 # This file is part of the build system of a GAP kernel extension.
 # Requires GNU autoconf, GNU automake and GNU libtool.
@@ -49,6 +49,17 @@ dnl ##
 dnl ## Detect pointer size to distinguish 32 and 64 bit builds
 dnl ##
 AC_CHECK_SIZEOF([void **])
+
+AC_ARG_WITH([eigen],
+    [AC_HELP_STRING([--with-eigen=<path>], [specify root of EIGEN installation])],
+    [EIGEN="$with_eigen"],
+)
+EIGEN_CPPFLAGS="-I$EIGEN"
+EIGEN_LDPATH="$EIGEN"
+EIGEN_LDFLAGS="-L$EIGEN_LDPATH"
+AC_SUBST(EIGEN_LDPATH)
+AC_SUBST(EIGEN_LDFLAGS)
+AC_SUBST(EIGEN_CPPFLAGS)
 
 dnl ##
 dnl ## Detect Windows resp. Cygwin
