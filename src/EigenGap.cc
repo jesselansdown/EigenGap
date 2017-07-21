@@ -8,6 +8,13 @@
 // (indirectly) includes gmp.h ...
 #include <gmp.h>
 
+#include <iostream>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+using namespace Eigen;
+using namespace std;
+
+
 extern "C" {
 #include "src/compiled.h"          /* GAP headers                */
 }
@@ -15,6 +22,32 @@ extern "C" {
 
 Obj TestCommand(Obj self)
 {
+
+  MatrixXd m = MatrixXd::Random(3,3);
+  m = (m + MatrixXd::Constant(3,3,1.2)) * 50;
+  cout << "m =" << endl << m << endl;
+  VectorXd v(3);
+  v << 1, 2, 3;
+  cout << "m * v =" << endl << m * v << endl;
+
+  int rows=3, cols=3;
+
+  MatrixXd A(rows, cols);
+  A(0,0) = 1;
+  A(0,1) = -3;
+  A(0,2) = 3;
+  A(1,0) = 3;
+  A(1,1) = -5;
+  A(1,2) = 3;
+  A(2,0) = 6;
+  A(2,1) = -6;
+  A(2,2) = 4;
+  cout << "Here is a random 6x6 matrix, A:" << endl << A << endl << endl;
+
+  EigenSolver<MatrixXd> es(A);
+  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
     return INTOBJ_INT(42);
 }
 
