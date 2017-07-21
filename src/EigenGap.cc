@@ -20,7 +20,7 @@ extern "C" {
 }
 
 
-Obj TestCommand(Obj self)
+Obj TestCommand(Obj self, Obj row_val)
 {
 
   MatrixXd m = MatrixXd::Random(3,3);
@@ -30,7 +30,8 @@ Obj TestCommand(Obj self)
   v << 1, 2, 3;
   cout << "m * v =" << endl << m * v << endl;
 
-  int rows=3, cols=3;
+  int rows = INT_INTOBJ(row_val);
+  int cols = INT_INTOBJ(row_val);
 
   MatrixXd A(rows, cols);
   A(0,0) = 1;
@@ -68,7 +69,7 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommand, 0, ""),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommand, 1, "row_val"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommandWithParams, 2, "param, param2"),
 
 	{ 0 } /* Finish with an empty entry */
