@@ -69,11 +69,6 @@ Obj EigenEigenvalues(Obj self, Obj mat)
 }
 
 
-Obj TestCommandWithParams(Obj self, Obj param, Obj param2)
-{
-    /* simply return the first parameter */
-    return param;
-}
 
 
 typedef Obj (* GVarFunc)(/*arguments*/);
@@ -87,7 +82,6 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", TestCommandWithParams, 2, "param, param2"),
 
 	{ 0 } /* Finish with an empty entry */
 
