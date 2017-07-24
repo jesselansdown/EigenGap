@@ -93,6 +93,111 @@ Obj Eigensolver(Obj self, Obj mat)
 
 
 
+Obj EigenEigenvalues(Obj self, Obj mat)
+{
+
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+
+  int dimension = LEN_PLIST(mat);
+
+  MatrixXd A(dimension, dimension);
+  int i, j;
+
+  for (i = 0; i < dimension; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < dimension; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_INTOBJ(entry_ij) )
+          A(j, i) = INT_INTOBJ(entry_ij);
+        else if ( IS_MACFLOAT(entry_ij) )
+          A(j, i) = VAL_MACFLOAT(entry_ij);
+        else
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
+    }
+  }
+
+//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
+
+  EigenSolver<MatrixXd> es(A);
+//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
+  Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(eigenvalues, dimension);
+  for (i = 0; i < dimension; i = i+1){
+    Obj complex_value = NEW_PLIST(T_PLIST, 2);
+    SET_LEN_PLIST(complex_value, 2);
+    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
+    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
+  }
+
+  return eigenvalues;
+
+}
+
+
+
+Obj EigenEigenvectors(Obj self, Obj mat)
+{
+
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+
+  int dimension = LEN_PLIST(mat);
+
+  MatrixXd A(dimension, dimension);
+  int i, j;
+
+  for (i = 0; i < dimension; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < dimension; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_INTOBJ(entry_ij) )
+          A(j, i) = INT_INTOBJ(entry_ij);
+        else if ( IS_MACFLOAT(entry_ij) )
+          A(j, i) = VAL_MACFLOAT(entry_ij);
+        else
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
+    }
+  }
+
+//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
+
+  EigenSolver<MatrixXd> es(A);
+//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
+  Obj eigenvectors = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(eigenvectors, dimension);
+  for (i = 0; i < dimension; i = i+1){
+
+    Obj current_eigenvector = NEW_PLIST(T_PLIST, dimension);
+    SET_LEN_PLIST(current_eigenvector, dimension);
+    for (j = 0; j < dimension; j = j+1){
+      Obj complex_value = NEW_PLIST(T_PLIST, 2);
+      SET_LEN_PLIST(complex_value, 2);
+      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(j)[i].real()));
+      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(j)[i].imag()));
+      SET_ELM_PLIST(current_eigenvector, j+1, complex_value);
+    }
+    SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
+  }
+
+
+  return eigenvectors;
+
+}
+
 
 typedef Obj (* GVarFunc)(/*arguments*/);
 
@@ -105,6 +210,8 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
 
 	{ 0 } /* Finish with an empty entry */
 
