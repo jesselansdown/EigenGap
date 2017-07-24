@@ -20,7 +20,7 @@ extern "C" {
 }
 
 
-Obj EigenEigenvalues(Obj self, Obj mat)
+Obj Eigensolver(Obj self, Obj mat)
 {
 
   if ( ! IS_PLIST(mat))
@@ -40,9 +40,9 @@ Obj EigenEigenvalues(Obj self, Obj mat)
     for (j = 0; j < dimension; j = j+1){
       Obj entry_ij = ELM_PLIST(row, j+1);
         if ( IS_INTOBJ(entry_ij) )
-          A(i, j) = INT_INTOBJ(entry_ij);
+          A(j, i) = INT_INTOBJ(entry_ij);
         else if ( IS_MACFLOAT(entry_ij) )
-          A(i, j) = VAL_MACFLOAT(entry_ij);
+          A(j, i) = VAL_MACFLOAT(entry_ij);
         else
           ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
     }
@@ -58,16 +58,13 @@ Obj EigenEigenvalues(Obj self, Obj mat)
   SET_LEN_PLIST(eigenvectors, dimension);
   for (i = 0; i < dimension; i = i+1){
 
-// Note, the eigenvectors seem to be given in columns? So even though this displays correctly,
-//  it should be transposed in order to be a proper vector in a list. Also, Eigen applies them
-//  to the right of the vector? So should transpose the matrix before solving?
     Obj current_eigenvector = NEW_PLIST(T_PLIST, dimension);
     SET_LEN_PLIST(current_eigenvector, dimension);
     for (j = 0; j < dimension; j = j+1){
       Obj complex_value = NEW_PLIST(T_PLIST, 2);
       SET_LEN_PLIST(complex_value, 2);
-      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(i)[j].real()));
-      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(i)[j].imag()));
+      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(j)[i].real()));
+      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(j)[i].imag()));
       SET_ELM_PLIST(current_eigenvector, j+1, complex_value);
     }
     SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
@@ -107,7 +104,7 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
 
 	{ 0 } /* Finish with an empty entry */
 
