@@ -9,9 +9,18 @@ To install, place in the "pkg" directory of GAP and run the following commands:
 - ./configure
 - make
 
-Currently only one function is implemented:
+Currently only three functions are implemented:
 
 EigenEigenvalue( mat );
 
 - Takes a nxn matrix of integers or floats (or a list of lists, since floating values are not considered matrices in the GAP sense)
 - Returns a list of the eigenvalues, where each eigenvalue is a list containing the real component in the first entry, and the imaginary component in the second entry.
+
+EigenEigenvectors( mat );
+
+- Takes a nxn matrix of integers or floats (or a list of lists, since floating values are not considered matrices in the GAP sense)
+- Returns a list of the eigenvectors, where each eigenvector entry is a list containing the real component in the first entry, and the imaginary component in the second entry.
+
+Eigensolver( mat );
+
+- Returns both the eigenvalues and eigenvectors. This function is currently buggy for large matricies.
