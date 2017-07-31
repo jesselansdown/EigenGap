@@ -272,6 +272,8 @@ Obj EigenSolutionMat(Obj self, Obj mat, Obj vec)
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
   int dimension = LEN_PLIST(mat);
+  if ( LEN_PLIST(ELM_PLIST(mat,1)) != dimension )
+      ErrorMayQuit( "Error: Must give an nxn matrix", 0, 0 );
 
   MatrixXd A(dimension, dimension);
   int i, j;

@@ -9,7 +9,7 @@ To install, place in the "pkg" directory of GAP and run the following commands:
 - ./configure
 - make
 
-Currently only three functions are implemented:
+Currently only the following functions are implemented:
 
 EigenEigenvalue( mat );
 
@@ -31,4 +31,4 @@ EigenSignatureOfSymmetricMatrix( mat);
 
 EigenSolutionMat
 
-- Functions in the same way as SolutionMat in GAP.
+- Functions in the same way as SolutionMat in GAP (only currently takes an nxn matrix).
