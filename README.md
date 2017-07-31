@@ -24,3 +24,11 @@ EigenEigenvectors( mat );
 Eigensolver( mat );
 
 - Returns both the eigenvalues and eigenvectors. This function is currently buggy for large matricies.
+
+EigenSignatureOfSymmetricMatrix( mat);
+
+- Returns the signature of a symmetric matrix: [# positive eigenvalues, # zero eigenvalues, # negative eigenvalues]
+
+EigenSolutionMat
+
+- Functions in the same way as SolutionMat in GAP.
