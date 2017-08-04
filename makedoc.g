@@ -8,6 +8,6 @@ if fail = LoadPackage("AutoDoc", "2016.02.16") then
 fi;
 
 AutoDoc( rec( scaffold := true, autodoc := true ) );
+AutoDoc( rec( maketest := rec( commands := [ "LoadPackage( \"EigenGap\" );"]), scaffold := true, autodoc := rec( files := [ "doc/Intro.autodoc", "src/EigenGap.cc"] ) ) );
 
 PrintTo("VERSION", PackageInfo("EigenGap")[1].Version);
-

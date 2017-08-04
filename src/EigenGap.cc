@@ -20,6 +20,16 @@ extern "C" {
 }
 
 
+/*
+  #! @Chapter Using EigenGap
+  #! @Section Currently one section
+  #! @Arguments the args
+  #! @Returns
+  #! @Description
+  #!  To do.
+  DeclareGlobalFunction("GurobiSetIntegerParameter");
+*/
+
 Obj Eigensolver(Obj self, Obj mat)
 {
 
