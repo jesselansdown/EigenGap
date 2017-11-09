@@ -20,6 +20,110 @@ extern "C" {
 }
 
 
+
+
+Obj TheTypeEigenMatrix;
+
+void SET_EIGENMATRIX(Obj o, MatrixXd* p) {
+    ADDR_OBJ(o)[0] = (Obj)p;
+}
+
+MatrixXd* GET_EIGENMATRIX(Obj o) {
+    return (MatrixXd*)(ADDR_OBJ(o)[0]);
+}
+
+#define IS_EIGENMATRIX(o) (TNUM_OBJ(o) == T_EIGEN)
+
+UInt T_EIGEN = 0;
+
+Obj NewEigenMatrix(MatrixXd* C)
+{
+    Obj o;
+    o = NewBag(T_EIGEN, 1 * sizeof(Obj));
+    SET_EIGENMATRIX(o, C);
+    return o;
+}
+
+/* Free function */
+void EigenFreeFunc(Obj o)
+{
+  delete GET_EIGENMATRIX(o);
+}
+
+/* Type object function for the object */
+Obj EigenTypeFunc(Obj o)
+{
+    return TheTypeEigenMatrix;
+}
+
+Obj EigenCopyFunc(Obj o, Int mut)
+{
+  MatrixXd* B = new MatrixXd(*GET_EIGENMATRIX(o));
+  return NewEigenMatrix(B);
+}
+
+void EigenCleanFunc(Obj o)
+{
+}
+
+Int EigenIsMutableObjFuncs(Obj o)
+{
+    return 0L;
+}
+
+
+
+
+Obj EigenMatrix(Obj self, Obj mat)
+{
+
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+
+  int dimension = LEN_PLIST(mat);
+
+  MatrixXd* A = new MatrixXd(dimension, dimension);
+  int i, j;
+
+  for (i = 0; i < dimension; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < dimension; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_INTOBJ(entry_ij) )
+          (*A)(j, i) = INT_INTOBJ(entry_ij);
+        else if ( IS_MACFLOAT(entry_ij) )
+          (*A)(j, i) = VAL_MACFLOAT(entry_ij);
+        else
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
+    }
+  }
+
+  //cout << &A << endl <<endl;
+
+  //MatrixXd& B = A;
+
+  //B(0,0)= 2;
+
+  //cout << B << endl <<endl;
+
+  //cout << "Here is the matrix you entered:" << endl << A << endl << endl;
+
+  return NewEigenMatrix(A);
+
+}
+
+
+Obj ViewEigenMatrix(Obj self, Obj mat)
+{
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+  cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
+  return True;
+}
+
 /*
   #! @Chapter Using EigenGap
   #! @Section Currently one section
@@ -352,6 +456,8 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
@@ -370,7 +476,19 @@ static Int InitKernel( StructInitInfo *module )
     /* init filters and functions                                          */
     InitHdlrFuncsFromTable( GVarFuncs );
 
-    /* return success                                                      */
+  
+    InitCopyGVar( "TheTypeEigenMatrix", &TheTypeEigenMatrix );
+
+
+  T_EIGEN = RegisterPackageTNUM("EigenMatrix", EigenTypeFunc);
+
+    InitMarkFuncBags(T_EIGEN, &MarkNoSubBags);
+    InitFreeFuncBag(T_EIGEN, &EigenFreeFunc);
+
+    CopyObjFuncs[ T_EIGEN ] = &EigenCopyFunc;
+    CleanObjFuncs[ T_EIGEN ] = &EigenCleanFunc;
+  IsMutableObjFuncs[ T_EIGEN ] = &EigenIsMutableObjFuncs;
+
     return 0;
 }
 
