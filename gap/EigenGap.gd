@@ -11,3 +11,8 @@ EigenObjectFamily := NewFamily( "EigenObjectFamily" );
 
 BindGlobal("TheTypeEigenMatrix", NewType( EigenObjectFamily, IsEigenMatrix ));
 
+
+DeclareCategory( "IsEigenTypeVector", IsObject );
+
+BindGlobal("TheTypeEigenTypeVector", NewType( EigenObjectFamily, IsEigenTypeVector ));
+

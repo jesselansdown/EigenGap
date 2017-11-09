@@ -74,47 +74,106 @@ Int EigenIsMutableObjFuncs(Obj o)
 
 
 
+Obj TheTypeEigenTypeVector;
+
+void SET_EIGENTYPEVECTOR(Obj o, VectorXd* p) {
+    ADDR_OBJ(o)[0] = (Obj)p;
+}
+
+VectorXd* GET_EIGENTYPEVECTOR(Obj o) {
+    return (VectorXd*)(ADDR_OBJ(o)[0]);
+}
+
+#define IS_EIGENTYPEVECTOR(o) (TNUM_OBJ(o) == T_EIGENTYPEVECTOR)
+
+UInt T_EIGENTYPEVECTOR = 0;
+
+Obj NewEigenTypeVector(VectorXd* C)
+{
+    Obj o;
+    o = NewBag(T_EIGENTYPEVECTOR, 1 * sizeof(Obj));
+    SET_EIGENTYPEVECTOR(o, C);
+    return o;
+}
+
+/* Free function */
+void EigenTypeVectorFreeFunc(Obj o)
+{
+  delete GET_EIGENTYPEVECTOR(o);
+}
+
+/* Type object function for the object */
+Obj EigenTypeVectorTypeFunc(Obj o)
+{
+    return TheTypeEigenTypeVector;
+}
+
+Obj EigenTypeVectorCopyFunc(Obj o, Int mut)
+{
+  VectorXd* V = new VectorXd(*GET_EIGENTYPEVECTOR(o));
+  return NewEigenTypeVector(V);
+}
+
+
+
+
 Obj EigenMatrix(Obj self, Obj mat)
 {
 
   if ( ! IS_PLIST(mat))
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
-  int dimension = LEN_PLIST(mat);
+  int nrows = LEN_PLIST(mat);
+  int ncols = LEN_PLIST(ELM_PLIST(mat, 1));
 
-  MatrixXd* A = new MatrixXd(dimension, dimension);
+
+  MatrixXd* A = new MatrixXd(nrows, ncols);
   int i, j;
 
-  for (i = 0; i < dimension; i = i+1){
+  for (i = 0; i < nrows; i = i+1){
     Obj row = ELM_PLIST(mat, i+1);
     
     if ( ! IS_PLIST(row) )
       ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
   
-    for (j = 0; j < dimension; j = j+1){
+    for (j = 0; j < ncols; j = j+1){
       Obj entry_ij = ELM_PLIST(row, j+1);
         if ( IS_INTOBJ(entry_ij) )
-          (*A)(j, i) = INT_INTOBJ(entry_ij);
+          (*A)(i, j) = INT_INTOBJ(entry_ij);
         else if ( IS_MACFLOAT(entry_ij) )
-          (*A)(j, i) = VAL_MACFLOAT(entry_ij);
+          (*A)(i, j) = VAL_MACFLOAT(entry_ij);
         else
           ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
     }
   }
 
-  //cout << &A << endl <<endl;
-
-  //MatrixXd& B = A;
-
-  //B(0,0)= 2;
-
-  //cout << B << endl <<endl;
-
-  //cout << "Here is the matrix you entered:" << endl << A << endl << endl;
-
   return NewEigenMatrix(A);
 
 }
+
+
+
+Obj EigenTypeVector(Obj self, Obj vec)
+{
+
+    int dimension = LEN_PLIST(vec);
+    VectorXd* V = new VectorXd(dimension);
+
+    int i;
+    for (i = 0; i < dimension; i = i+1){
+      Obj entry_i = ELM_PLIST(vec, i+1);
+        if ( IS_INTOBJ(entry_i) )
+          (*V)(i) = INT_INTOBJ(entry_i);
+        else if ( IS_MACFLOAT(entry_i) )
+          (*V)(i) = VAL_MACFLOAT(entry_i);
+        else
+          ErrorMayQuit( "Error: Vector may only contain integers or floats.", 0, 0 ); 
+    }
+
+  cout << "Here is the vector you entered:" << endl << *V << endl << endl;
+  return NewEigenTypeVector(V);
+}
+
 
 
 Obj ViewEigenMatrix(Obj self, Obj mat)
@@ -123,6 +182,74 @@ Obj ViewEigenMatrix(Obj self, Obj mat)
   cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
   return True;
 }
+
+Obj ViewEigenTypeVector(Obj self, Obj vec)
+{
+  VectorXd *V = GET_EIGENTYPEVECTOR(vec);
+  cout << "Here is the std::vector<char> v; you entered:" << endl << *V << endl << endl;
+  return True;
+}
+
+
+
+
+
+/*
+  #! @Chapter Using EigenGap
+  #! @Section Currently one section
+  #! @Arguments the args
+  #! @Returns
+  #! @Description
+  #!  To do.
+  DeclareGlobalFunction("GurobiSetIntegerParameter");
+*/
+
+// Solves Ax = b for matrix A and vector b
+
+Obj EigenSolutionMat(Obj self, Obj mat, Obj mat2)
+{
+
+  if ( ! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  if ( ! IS_EIGENMATRIX(mat2))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+  MatrixXd *V = GET_EIGENMATRIX(mat2);
+
+  int nmatrows = (*A).rows();
+  int nvecrows = (*V).rows();
+  if ( nmatrows != nvecrows )
+    ErrorMayQuit( "Error: matrix A and matrix b must have compatible dimensions in the equation Ax = b!", 0, 0 );
+
+  int i, j;
+
+  MatrixXd x = (*A).colPivHouseholderQr().solve(*V);
+
+  int nsolrows = x.rows();
+  int nsolcols = x.rows();
+
+  Obj solution = NEW_PLIST(T_PLIST, nsolrows);
+  SET_LEN_PLIST(solution, nsolrows);
+  for (i = 0; i < nsolrows; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, nsolcols);
+    SET_LEN_PLIST(current_solution_row, nsolcols);
+    for (j = 0; j < nsolcols; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
+    }
+    SET_ELM_PLIST(solution, i+1, current_solution_row);
+   }
+
+  return solution;
+
+}
+
+
+
+
+
 
 /*
   #! @Chapter Using EigenGap
@@ -210,34 +337,17 @@ Obj Eigensolver(Obj self, Obj mat)
 Obj EigenEigenvalues(Obj self, Obj mat)
 {
 
-  if ( ! IS_PLIST(mat))
-          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  if (! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
 
-  int dimension = LEN_PLIST(mat);
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+  EigenSolver<MatrixXd> es(*A);
 
-  MatrixXd A(dimension, dimension);
+  int dimension = 2;
   int i, j;
-
-  for (i = 0; i < dimension; i = i+1){
-    Obj row = ELM_PLIST(mat, i+1);
-    
-    if ( ! IS_PLIST(row) )
-      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
-  
-    for (j = 0; j < dimension; j = j+1){
-      Obj entry_ij = ELM_PLIST(row, j+1);
-        if ( IS_INTOBJ(entry_ij) )
-          A(j, i) = INT_INTOBJ(entry_ij);
-        else if ( IS_MACFLOAT(entry_ij) )
-          A(j, i) = VAL_MACFLOAT(entry_ij);
-        else
-          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
-    }
-  }
 
 //  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
 
-  EigenSolver<MatrixXd> es(A);
 //  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
 //  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
 
@@ -379,72 +489,6 @@ Obj EigenSignatureOfSymmetricMatrix(Obj self, Obj mat)
 
 
 
-Obj EigenSolutionMat(Obj self, Obj mat, Obj vec)
-{
-
-  if ( ! IS_PLIST(mat))
-          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
-
-  int dimension = LEN_PLIST(mat);
-  if ( LEN_PLIST(ELM_PLIST(mat,1)) != dimension )
-      ErrorMayQuit( "Error: Must give an nxn matrix", 0, 0 );
-
-  MatrixXd A(dimension, dimension);
-  int i, j;
-
-  for (i = 0; i < dimension; i = i+1){
-    Obj row = ELM_PLIST(mat, i+1);
-    
-    if ( ! IS_PLIST(row) )
-      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
-  
-    for (j = 0; j < dimension; j = j+1){
-      Obj entry_ij = ELM_PLIST(row, j+1);
-        if ( IS_INTOBJ(entry_ij) )
-          A(j, i) = INT_INTOBJ(entry_ij);
-        else if ( IS_MACFLOAT(entry_ij) )
-          A(j, i) = VAL_MACFLOAT(entry_ij);
-        else
-          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
-    }
-  }
-
-  VectorXd V(dimension);
-
-    for (i = 0; i < dimension; i = i+1){
-      Obj entry_i = ELM_PLIST(vec, i+1);
-        if ( IS_INTOBJ(entry_i) )
-          V(i) = INT_INTOBJ(entry_i);
-        else if ( IS_MACFLOAT(entry_i) )
-          A(i) = VAL_MACFLOAT(entry_i);
-        else
-          ErrorMayQuit( "Error: Vector may only contain integers or floats.", 0, 0 ); 
-    }
-
-//  cout << "Here is the matrix A:\n" << A << endl;
-//   cout << "Here is the vector V:\n" << V << endl;
-
-  VectorXd x = A.colPivHouseholderQr().solve(V);
-//  cout << "The solution is:\n" << x << endl;
-//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
-
-//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
-//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
-
-   Obj solution = NEW_PLIST(T_PLIST, dimension);
-   SET_LEN_PLIST(solution, dimension);
-   for (i = 0; i < dimension; i = i+1){
-  //   Obj complex_value = NEW_PLIST(T_PLIST, 2);
-  //   SET_LEN_PLIST(complex_value, 2);
-  //   SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
-  //   SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
-     SET_ELM_PLIST(solution, i+1, NEW_MACFLOAT(x.col(0)[i]));
-   }
-
-  return solution;
-
-}
-
 
 typedef Obj (* GVarFunc)(/*arguments*/);
 
@@ -458,11 +502,13 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenTypeVector, 1, "vec"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenTypeVector, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSignatureOfSymmetricMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
 
 	{ 0 } /* Finish with an empty entry */
 
@@ -488,6 +534,21 @@ static Int InitKernel( StructInitInfo *module )
     CopyObjFuncs[ T_EIGEN ] = &EigenCopyFunc;
     CleanObjFuncs[ T_EIGEN ] = &EigenCleanFunc;
   IsMutableObjFuncs[ T_EIGEN ] = &EigenIsMutableObjFuncs;
+
+
+
+  
+    InitCopyGVar( "TheTypeEigenTypeVector", &TheTypeEigenTypeVector );
+
+
+  T_EIGENTYPEVECTOR = RegisterPackageTNUM("EigenMatrix", EigenTypeVectorTypeFunc);
+
+    InitMarkFuncBags(T_EIGENTYPEVECTOR, &MarkNoSubBags);
+    InitFreeFuncBag(T_EIGENTYPEVECTOR, &EigenTypeVectorFreeFunc);
+
+    CopyObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenTypeVectorCopyFunc;
+    CleanObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenCleanFunc;
+  IsMutableObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenIsMutableObjFuncs;
 
     return 0;
 }
