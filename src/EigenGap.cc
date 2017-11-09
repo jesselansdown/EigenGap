@@ -224,12 +224,32 @@ Obj EigenSolutionMat(Obj self, Obj mat, Obj mat2)
   if ( nmatrows != nvecrows )
     ErrorMayQuit( "Error: matrix A and matrix b must have compatible dimensions in the equation Ax = b!", 0, 0 );
 
+  MatrixXd* x = new MatrixXd();
+
+  (*x) = (*A).colPivHouseholderQr().solve(*V);
+
+  return NewEigenMatrix(x);
+
+}
+
+
+
+
+
+
+
+
+Obj ReverseEigenMatrix(Obj self, Obj mat)
+{
+
+  if ( ! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXd *x = GET_EIGENMATRIX(mat);
+  int nsolrows = (*x).rows();
+  int nsolcols = (*x).rows();
+
   int i, j;
-
-  MatrixXd x = (*A).colPivHouseholderQr().solve(*V);
-
-  int nsolrows = x.rows();
-  int nsolcols = x.rows();
 
   Obj solution = NEW_PLIST(T_PLIST, nsolrows);
   SET_LEN_PLIST(solution, nsolrows);
@@ -237,15 +257,44 @@ Obj EigenSolutionMat(Obj self, Obj mat, Obj mat2)
     Obj current_solution_row = NEW_PLIST(T_PLIST, nsolcols);
     SET_LEN_PLIST(current_solution_row, nsolcols);
     for (j = 0; j < nsolcols; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT((*x).row(i)[j]));
     }
     SET_ELM_PLIST(solution, i+1, current_solution_row);
    }
-
-  return solution;
-
+ return solution;
 }
 
+
+
+// rank, kernel, image
+Obj EigenRank(Obj self, Obj mat)
+{
+
+  if ( ! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+
+  int nmatrows = (*A).rows();
+
+  FullPivLU<MatrixXd> lu_decomp(*A);
+
+  int rank = lu_decomp.rank();
+
+  MatrixXd* x = new MatrixXd();
+  (*x) = lu_decomp.kernel();
+
+  MatrixXd* y = new MatrixXd();
+  (*y) = lu_decomp.image(*A);
+
+  Obj solution = NEW_PLIST(T_PLIST, 3);
+  SET_LEN_PLIST(solution, 3);
+  SET_ELM_PLIST(solution, 1, INTOBJ_INT(rank));
+  SET_ELM_PLIST(solution, 2, NewEigenMatrix(x));
+  SET_ELM_PLIST(solution, 3,  NewEigenMatrix(y));
+
+  return solution;
+}
 
 
 
@@ -505,6 +554,8 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenTypeVector, 1, "vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenTypeVector, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
