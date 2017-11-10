@@ -247,7 +247,7 @@ Obj ReverseEigenMatrix(Obj self, Obj mat)
 
   MatrixXd *x = GET_EIGENMATRIX(mat);
   int nsolrows = (*x).rows();
-  int nsolcols = (*x).rows();
+  int nsolcols = (*x).cols();
 
   int i, j;
 
@@ -260,8 +260,8 @@ Obj ReverseEigenMatrix(Obj self, Obj mat)
       SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT((*x).row(i)[j]));
     }
     SET_ELM_PLIST(solution, i+1, current_solution_row);
-   }
- return solution;
+  }
+  return solution;
 }
 
 
