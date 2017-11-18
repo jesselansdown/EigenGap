@@ -14,6 +14,7 @@
 using namespace Eigen;
 using namespace std;
 
+#include <complex>
 
 extern "C" {
 #include "src/compiled.h"          /* GAP headers                */
@@ -74,44 +75,44 @@ Int EigenIsMutableObjFuncs(Obj o)
 
 
 
-Obj TheTypeEigenTypeVector;
+Obj TheTypeEigenComplexMatrix;
 
-void SET_EIGENTYPEVECTOR(Obj o, VectorXd* p) {
+void SET_EIGENCOMPLEXMATRIX(Obj o, MatrixXcd* p) {
     ADDR_OBJ(o)[0] = (Obj)p;
 }
 
-VectorXd* GET_EIGENTYPEVECTOR(Obj o) {
-    return (VectorXd*)(ADDR_OBJ(o)[0]);
+MatrixXcd* GET_EIGENCOMPLEXMATRIX(Obj o) {
+    return (MatrixXcd*)(ADDR_OBJ(o)[0]);
 }
 
-#define IS_EIGENTYPEVECTOR(o) (TNUM_OBJ(o) == T_EIGENTYPEVECTOR)
+#define IS_EIGENCOMPLEXMATRIX(o) (TNUM_OBJ(o) == T_EIGENCOMPLEXMATRIX)
 
-UInt T_EIGENTYPEVECTOR = 0;
+UInt T_EIGENCOMPLEXMATRIX = 0;
 
-Obj NewEigenTypeVector(VectorXd* C)
+Obj NewEigenComplexMatrix(MatrixXcd* C)
 {
     Obj o;
-    o = NewBag(T_EIGENTYPEVECTOR, 1 * sizeof(Obj));
-    SET_EIGENTYPEVECTOR(o, C);
+    o = NewBag(T_EIGENCOMPLEXMATRIX, 1 * sizeof(Obj));
+    SET_EIGENCOMPLEXMATRIX(o, C);
     return o;
 }
 
 /* Free function */
-void EigenTypeVectorFreeFunc(Obj o)
+void EigenComplexMatrixFreeFunc(Obj o)
 {
-  delete GET_EIGENTYPEVECTOR(o);
+  delete GET_EIGENCOMPLEXMATRIX(o);
 }
 
 /* Type object function for the object */
-Obj EigenTypeVectorTypeFunc(Obj o)
+Obj EigenComplexMatrixTypeFunc(Obj o)
 {
-    return TheTypeEigenTypeVector;
+    return TheTypeEigenComplexMatrix;
 }
 
-Obj EigenTypeVectorCopyFunc(Obj o, Int mut)
+Obj EigenComplexMatrixCopyFunc(Obj o, Int mut)
 {
-  VectorXd* V = new VectorXd(*GET_EIGENTYPEVECTOR(o));
-  return NewEigenTypeVector(V);
+  MatrixXcd* V = new MatrixXcd(*GET_EIGENCOMPLEXMATRIX(o));
+  return NewEigenComplexMatrix(V);
 }
 
 
@@ -153,25 +154,54 @@ Obj EigenMatrix(Obj self, Obj mat)
 
 
 
-Obj EigenTypeVector(Obj self, Obj vec)
+
+Obj EigenComplexMatrix(Obj self, Obj mat)
 {
 
-    int dimension = LEN_PLIST(vec);
-    VectorXd* V = new VectorXd(dimension);
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
-    int i;
-    for (i = 0; i < dimension; i = i+1){
-      Obj entry_i = ELM_PLIST(vec, i+1);
-        if ( IS_INTOBJ(entry_i) )
-          (*V)(i) = INT_INTOBJ(entry_i);
-        else if ( IS_MACFLOAT(entry_i) )
-          (*V)(i) = VAL_MACFLOAT(entry_i);
+  int nrows = LEN_PLIST(mat);
+  int ncols = LEN_PLIST(ELM_PLIST(mat, 1));
+
+
+  MatrixXcd* A = new MatrixXcd(nrows, ncols);
+  int i, j;
+
+  for (i = 0; i < nrows; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < ncols; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+      if ( ! IS_PLIST(entry_ij) )
+        ErrorMayQuit( "Error: Must give a complex_value", 0, 0 );
+        Obj rl = ELM_PLIST(entry_ij, 1);
+        Obj cmplx = ELM_PLIST(entry_ij, 2);
+
+        complex<double> value(1.0, 2.0);
+        double rl2;
+        if ( IS_MACFLOAT(rl) )
+          rl2 = VAL_MACFLOAT(rl);
         else
-          ErrorMayQuit( "Error: Vector may only contain integers or floats.", 0, 0 ); 
-    }
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
+ 
+        double cmplx2;
+        if ( IS_MACFLOAT(cmplx) )
+          cmplx2 = VAL_MACFLOAT(cmplx);
+        else
+          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
 
-  cout << "Here is the vector you entered:" << endl << *V << endl << endl;
-  return NewEigenTypeVector(V);
+        value = std::complex<double>(rl2, cmplx2);
+        (*A)(i, j) = value;
+
+    }
+  }
+
+  return NewEigenComplexMatrix(A);
+
 }
 
 
@@ -183,13 +213,13 @@ Obj ViewEigenMatrix(Obj self, Obj mat)
   return True;
 }
 
-Obj ViewEigenTypeVector(Obj self, Obj vec)
+
+Obj ViewEigenComplexMatrix(Obj self, Obj mat)
 {
-  VectorXd *V = GET_EIGENTYPEVECTOR(vec);
-  cout << "Here is the std::vector<char> v; you entered:" << endl << *V << endl << endl;
+  MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
+  cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
   return True;
 }
-
 
 
 
@@ -295,6 +325,98 @@ Obj EigenRank(Obj self, Obj mat)
 
   return solution;
 }
+
+
+
+Obj EigenComplexMatrixSignatureOfHermitian(Obj self, Obj mat, Obj dim)
+{
+
+  if (! IS_EIGENCOMPLEXMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
+  ComplexEigenSolver<MatrixXcd> es(*A);
+
+  int dimension = INT_INTOBJ(dim);
+  int i, j;
+
+//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
+
+//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
+  Obj eigenvalues = NEW_PLIST(T_PLIST, 3);
+
+  int n0 =0;
+  int nplus = 0;
+  int nminus =0;
+
+  for (i = 0; i < dimension; i = i+1){
+    if (es.eigenvalues().col(0)[i].real() > 0.01)
+    {
+      nplus = nplus +1 ;
+    }
+    else if (es.eigenvalues().col(0)[i].real() < 0.01)
+    {
+      nminus = nminus +1;
+    }
+    else
+    {
+      n0 = n0 +1;
+    }
+  }
+
+  SET_LEN_PLIST(eigenvalues, 3);
+  SET_ELM_PLIST(eigenvalues, 1, INTOBJ_INT(nplus));
+  SET_ELM_PLIST(eigenvalues, 2, INTOBJ_INT(n0));
+  SET_ELM_PLIST(eigenvalues, 3, INTOBJ_INT(nminus));
+  return eigenvalues;
+
+}
+
+
+
+
+
+
+Obj EigenComplexMatrixEigenvalues(Obj self, Obj mat)
+{
+
+  if (! IS_EIGENCOMPLEXMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
+  ComplexEigenSolver<MatrixXcd> es(*A);
+
+  int dimension = 2;
+  int i, j;
+
+//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
+
+//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
+//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
+
+  cout << es.eigenvalues();
+  Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(eigenvalues, dimension);
+  for (i = 0; i < dimension; i = i+1){
+    Obj complex_value = NEW_PLIST(T_PLIST, 2);
+    SET_LEN_PLIST(complex_value, 2);
+    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
+    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
+  }
+
+  return eigenvalues;
+
+}
+
+
+
+
+// ###################################################
+
+
 
 
 
@@ -550,14 +672,16 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenTypeVector, 1, "vec"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenTypeVector, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenComplexMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixEigenvalues, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixSignatureOfHermitian, 2, "mat, dim"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSignatureOfSymmetricMatrix, 1, "mat"),
 
@@ -589,17 +713,17 @@ static Int InitKernel( StructInitInfo *module )
 
 
   
-    InitCopyGVar( "TheTypeEigenTypeVector", &TheTypeEigenTypeVector );
+    InitCopyGVar( "TheTypeEigenComplexMatrix", &TheTypeEigenComplexMatrix );
 
 
-  T_EIGENTYPEVECTOR = RegisterPackageTNUM("EigenMatrix", EigenTypeVectorTypeFunc);
+  T_EIGENCOMPLEXMATRIX = RegisterPackageTNUM("EigenMatrix", EigenComplexMatrixTypeFunc);
 
-    InitMarkFuncBags(T_EIGENTYPEVECTOR, &MarkNoSubBags);
-    InitFreeFuncBag(T_EIGENTYPEVECTOR, &EigenTypeVectorFreeFunc);
+    InitMarkFuncBags(T_EIGENCOMPLEXMATRIX, &MarkNoSubBags);
+    InitFreeFuncBag(T_EIGENCOMPLEXMATRIX, &EigenComplexMatrixFreeFunc);
 
-    CopyObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenTypeVectorCopyFunc;
-    CleanObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenCleanFunc;
-  IsMutableObjFuncs[ T_EIGENTYPEVECTOR ] = &EigenIsMutableObjFuncs;
+    CopyObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenComplexMatrixCopyFunc;
+    CleanObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenCleanFunc;
+  IsMutableObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenIsMutableObjFuncs;
 
     return 0;
 }
