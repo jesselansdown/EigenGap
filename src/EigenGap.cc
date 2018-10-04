@@ -121,15 +121,15 @@ Setting up the matrices
 ********************************************/
 
 /*
-  #! @Chapter Converting matrices
-  #! @Section Currently one section
+  #! @Chapter Using EigenGAP
+  #! @Section Converting Matrices
   #! @Arguments Matrix
   #! @Returns EigenRealMatrix object
   #! @Description
   #!  Takes a matrix with real entries and converts it to an Eigen type matrix.
   #!  Note that the entries must be either integers or floats. Fractional entries will
   #!  not be accepted, and must first be converted to a float.
-  DeclareGlobalFunction("EigenMatrix");
+  DeclareGlobalFunction("EigenRealMatrix");
 */
 
 Obj EigenRealMatrix(Obj self, Obj mat)
@@ -171,14 +171,14 @@ Obj EigenRealMatrix(Obj self, Obj mat)
 
 
 /*
-  #! @Chapter Converting matrices
-  #! @Section Currently one section
+  #! @Chapter Using EigenGAP
+  #! @Section Converting Matrices
   #! @Arguments Matrix
   #! @Returns EigenComplexMatrix object
   #! @Description
   #!  Takes a matrix with complex entries and converts it to an Eigen type matrix. The entries
   #!  must be a list [a, b] where a and b are either integers or floats.
-  DeclareGlobalFunction("EigenMatrix");
+  DeclareGlobalFunction("EigenComplexMatrix");
 */
 
 
@@ -240,13 +240,13 @@ Obj EigenComplexMatrix(Obj self, Obj mat)
 
 
 /*
-  #! @Chapter Converting matrices
-  #! @Section Currently one section
-  #! @Arguments EigenRealMatrix or EigenComplexMatrix
+  #! @Chapter Using EigenGAP
+  #! @Section Converting Matrices
+  #! @Arguments EigenRealMatrix/EigenComplexMatrix
   #! @Returns True
   #! @Description
   #! Takes an Eigen real or complex matrix object and prints it to the screen.
-  DeclareGlobalFunction("EigenMatrix");
+  DeclareGlobalFunction("ViewEigenMatrix");
 */
 
 
@@ -293,14 +293,14 @@ Obj __SignatureOfComplexHermitianMatrix(Obj self, Obj mat, Obj dim, Obj tol)
   int n0 =0;
   int nplus = 0;
   int nminus =0;
-  int tol2 = INT_INTOBJ(tol);
+  int tol2 = VAL_MACFLOAT(tol);
 
   for (i = 0; i < dimension; i = i+1){
     if (es.eigenvalues().col(0)[i].real() > tol2)
     {
       nplus = nplus +1 ;
     }
-    else if (es.eigenvalues().col(0)[i].real() < tol2)
+    else if (es.eigenvalues().col(0)[i].real() < -1*tol2)
     {
       nminus = nminus +1;
     }
@@ -317,6 +317,70 @@ Obj __SignatureOfComplexHermitianMatrix(Obj self, Obj mat, Obj dim, Obj tol)
   return eigenvalues;
 
 }
+
+
+Obj __SignatureOfRealSymmetricMatrix(Obj self, Obj mat, Obj dim, Obj tol)
+{
+
+  if (! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+
+  int dimension = INT_INTOBJ(dim);
+  int i, j;
+
+  EigenSolver<MatrixXd> es(*A);
+
+  double val;
+  int pos = 0;
+  int neg = 0;
+  int null = 0;
+  int tol2 = VAL_MACFLOAT(tol);
+
+  for (i = 0; i < dimension; i = i+1){
+    val = es.eigenvalues().col(0)[i].real();
+    if (val > tol2)
+      pos = pos + 1;
+    else if (val < -1*tol2)
+      neg = neg+1;
+    else
+      null = null + 1;
+  }
+
+  Obj signature = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(signature, 3);
+  SET_ELM_PLIST(signature, 1, INTOBJ_INT(pos));
+  SET_ELM_PLIST(signature, 2, INTOBJ_INT(null));
+  SET_ELM_PLIST(signature, 3, INTOBJ_INT(neg));
+
+cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
+  return signature;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -642,64 +706,6 @@ Obj EigenEigenvectors(Obj self, Obj mat)
 
 
 
-Obj EigenSignatureOfSymmetricMatrix(Obj self, Obj mat)
-{
-
-  if ( ! IS_PLIST(mat))
-          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
-
-  int dimension = LEN_PLIST(mat);
-
-  MatrixXd A(dimension, dimension);
-  int i, j;
-
-  for (i = 0; i < dimension; i = i+1){
-    Obj row = ELM_PLIST(mat, i+1);
-    
-    if ( ! IS_PLIST(row) )
-      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
-  
-    for (j = 0; j < dimension; j = j+1){
-      Obj entry_ij = ELM_PLIST(row, j+1);
-        if ( IS_INTOBJ(entry_ij) )
-          A(j, i) = INT_INTOBJ(entry_ij);
-        else if ( IS_MACFLOAT(entry_ij) )
-          A(j, i) = VAL_MACFLOAT(entry_ij);
-        else
-          ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
-    }
-  }
-
-//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
-
-  EigenSolver<MatrixXd> es(A);
-//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
-//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
-  double val;
-  int pos = 0;
-  int neg = 0;
-  int null = 0;
-  for (i = 0; i < dimension; i = i+1){
-    val = es.eigenvalues().col(0)[i].real();
-    if (val > 0.0001)
-      pos = pos + 1;
-    else if (val < -0.0001)
-      neg = neg+1;
-    else
-      null = null + 1;
-  }
-
-  Obj signature = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(signature, 3);
-  SET_ELM_PLIST(signature, 1, INTOBJ_INT(pos));
-  SET_ELM_PLIST(signature, 2, INTOBJ_INT(null));
-  SET_ELM_PLIST(signature, 3, INTOBJ_INT(neg));
-
-  return signature;
-
-}
-
-
 
 
 
@@ -719,7 +725,8 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfComplexHermitianMatrix, 2, "mat, dim, tol"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfComplexHermitianMatrix, 3, "mat, dim, tol"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfRealSymmetricMatrix, 3, "mat, dim, tol"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
@@ -727,7 +734,6 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSignatureOfSymmetricMatrix, 1, "mat"),
 
 	{ 0 } /* Finish with an empty entry */
 
