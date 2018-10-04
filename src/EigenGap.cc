@@ -116,12 +116,28 @@ Obj EigenComplexMatrixCopyFunc(Obj o, Int mut)
 }
 
 
+/*******************************************
+Setting up the matrices
+********************************************/
 
+/*
+  #! @Chapter Converting matrices
+  #! @Section Currently one section
+  #! @Arguments Matrix
+  #! @Returns EigenRealMatrix object
+  #! @Description
+  #!  Takes a matrix with real entries and converts it to an Eigen type matrix.
+  #!  Note that the entries must be either integers or floats. Fractional entries will
+  #!  not be accepted, and must first be converted to a float.
+  DeclareGlobalFunction("EigenMatrix");
+*/
 
-Obj EigenMatrix(Obj self, Obj mat)
+Obj EigenRealMatrix(Obj self, Obj mat)
 {
 
   if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  if ( ! IS_PLIST(ELM_PLIST(mat, 1)))
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
   int nrows = LEN_PLIST(mat);
@@ -154,11 +170,24 @@ Obj EigenMatrix(Obj self, Obj mat)
 
 
 
+/*
+  #! @Chapter Converting matrices
+  #! @Section Currently one section
+  #! @Arguments Matrix
+  #! @Returns EigenComplexMatrix object
+  #! @Description
+  #!  Takes a matrix with complex entries and converts it to an Eigen type matrix. The entries
+  #!  must be a list [a, b] where a and b are either integers or floats.
+  DeclareGlobalFunction("EigenMatrix");
+*/
+
 
 Obj EigenComplexMatrix(Obj self, Obj mat)
 {
 
   if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  if ( ! IS_PLIST(ELM_PLIST(mat, 1)))
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
   int nrows = LEN_PLIST(mat);
@@ -185,12 +214,16 @@ Obj EigenComplexMatrix(Obj self, Obj mat)
         double rl2;
         if ( IS_MACFLOAT(rl) )
           rl2 = VAL_MACFLOAT(rl);
+        else if ( IS_INTOBJ(rl) )
+          rl2 = INT_INTOBJ(rl);
         else
           ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
  
         double cmplx2;
         if ( IS_MACFLOAT(cmplx) )
           cmplx2 = VAL_MACFLOAT(cmplx);
+        else if ( IS_INTOBJ(cmplx) )
+          cmplx2 = INT_INTOBJ(cmplx);
         else
           ErrorMayQuit( "Error: Matrix may only contain integers or floats.", 0, 0 ); 
 
@@ -206,19 +239,83 @@ Obj EigenComplexMatrix(Obj self, Obj mat)
 
 
 
+/*
+  #! @Chapter Converting matrices
+  #! @Section Currently one section
+  #! @Arguments EigenRealMatrix or EigenComplexMatrix
+  #! @Returns True
+  #! @Description
+  #! Takes an Eigen real or complex matrix object and prints it to the screen.
+  DeclareGlobalFunction("EigenMatrix");
+*/
+
+
 Obj ViewEigenMatrix(Obj self, Obj mat)
 {
-  MatrixXd *A = GET_EIGENMATRIX(mat);
-  cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
+  if ( IS_EIGENMATRIX(mat)){
+    MatrixXd *A = GET_EIGENMATRIX(mat);
+    cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
+  }
+  else if ( IS_EIGENCOMPLEXMATRIX(mat)){
+
+    MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
+   cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
+  }
+  else{
+      ErrorMayQuit( "Error: Must pass an Eigen real or complex matrix object.", 0, 0 ); 
+  }
   return True;
 }
 
 
-Obj ViewEigenComplexMatrix(Obj self, Obj mat)
+
+
+
+/*******************************************
+Signatures
+********************************************/
+
+
+Obj __SignatureOfComplexHermitianMatrix(Obj self, Obj mat, Obj dim, Obj tol)
 {
+
+  if (! IS_EIGENCOMPLEXMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
   MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
-  cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
-  return True;
+  ComplexEigenSolver<MatrixXcd> es(*A);
+
+  int dimension = INT_INTOBJ(dim);
+  int i, j;
+
+  Obj eigenvalues = NEW_PLIST(T_PLIST, 3);
+
+  int n0 =0;
+  int nplus = 0;
+  int nminus =0;
+  int tol2 = INT_INTOBJ(tol);
+
+  for (i = 0; i < dimension; i = i+1){
+    if (es.eigenvalues().col(0)[i].real() > tol2)
+    {
+      nplus = nplus +1 ;
+    }
+    else if (es.eigenvalues().col(0)[i].real() < tol2)
+    {
+      nminus = nminus +1;
+    }
+    else
+    {
+      n0 = n0 +1;
+    }
+  }
+
+  SET_LEN_PLIST(eigenvalues, 3);
+  SET_ELM_PLIST(eigenvalues, 1, INTOBJ_INT(nplus));
+  SET_ELM_PLIST(eigenvalues, 2, INTOBJ_INT(n0));
+  SET_ELM_PLIST(eigenvalues, 3, INTOBJ_INT(nminus));
+  return eigenvalues;
+
 }
 
 
@@ -325,58 +422,6 @@ Obj EigenRank(Obj self, Obj mat)
 
   return solution;
 }
-
-
-
-Obj EigenComplexMatrixSignatureOfHermitian(Obj self, Obj mat, Obj dim)
-{
-
-  if (! IS_EIGENCOMPLEXMATRIX(mat))
-          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
-
-  MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
-  ComplexEigenSolver<MatrixXcd> es(*A);
-
-  int dimension = INT_INTOBJ(dim);
-  int i, j;
-
-//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
-
-//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
-//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
-
-  Obj eigenvalues = NEW_PLIST(T_PLIST, 3);
-
-  int n0 =0;
-  int nplus = 0;
-  int nminus =0;
-
-  for (i = 0; i < dimension; i = i+1){
-    if (es.eigenvalues().col(0)[i].real() > 0.01)
-    {
-      nplus = nplus +1 ;
-    }
-    else if (es.eigenvalues().col(0)[i].real() < 0.01)
-    {
-      nminus = nminus +1;
-    }
-    else
-    {
-      n0 = n0 +1;
-    }
-  }
-
-  SET_LEN_PLIST(eigenvalues, 3);
-  SET_ELM_PLIST(eigenvalues, 1, INTOBJ_INT(nplus));
-  SET_ELM_PLIST(eigenvalues, 2, INTOBJ_INT(n0));
-  SET_ELM_PLIST(eigenvalues, 3, INTOBJ_INT(nminus));
-  return eigenvalues;
-
-}
-
-
-
-
 
 
 Obj EigenComplexMatrixEigenvalues(Obj self, Obj mat)
@@ -671,17 +716,16 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenComplexMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfComplexHermitianMatrix, 2, "mat, dim, tol"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixEigenvalues, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixSignatureOfHermitian, 2, "mat, dim"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSignatureOfSymmetricMatrix, 1, "mat"),
 
