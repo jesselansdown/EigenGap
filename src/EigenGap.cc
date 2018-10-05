@@ -354,7 +354,6 @@ Obj __SignatureOfRealSymmetricMatrix(Obj self, Obj mat, Obj dim, Obj tol)
   SET_ELM_PLIST(signature, 2, INTOBJ_INT(null));
   SET_ELM_PLIST(signature, 3, INTOBJ_INT(neg));
 
-cout << "Here is the matrix you entered:" << endl << *A << endl << endl;
   return signature;
 
 }
