@@ -360,6 +360,37 @@ Obj __SignatureOfRealSymmetricMatrix(Obj self, Obj mat, Obj dim, Obj tol)
 
 
 
+Obj __SpectrumOfRealMatrix(Obj self, Obj mat, Obj dim)
+{
+
+  if ( !IS_INTOBJ(dim) )
+         ErrorMayQuit( "Error: Must give an Eigen pas the dimension of the matrix", 0, 0 );
+
+  if (! IS_EIGENMATRIX(mat))
+          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
+
+  MatrixXd *A = GET_EIGENMATRIX(mat);
+  EigenSolver<MatrixXd> es(*A);
+
+  long dimension = INT_INTOBJ(dim);
+  int i;
+
+  Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
+  SET_LEN_PLIST(eigenvalues, dimension);
+  for (i = 0; i < dimension; i = i+1){
+    Obj complex_value = NEW_PLIST(T_PLIST, 2);
+    SET_LEN_PLIST(complex_value, 2);
+    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
+    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
+  }
+
+  return eigenvalues;
+
+}
+
+
+
 
 
 
@@ -436,8 +467,8 @@ Obj ReverseEigenMatrix(Obj self, Obj mat)
           ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
 
   MatrixXd *x = GET_EIGENMATRIX(mat);
-  int nsolrows = (*x).rows();
-  int nsolcols = (*x).cols();
+  long nsolrows = (*x).rows();
+  long nsolcols = (*x).cols();
 
   int i, j;
 
@@ -496,7 +527,7 @@ Obj EigenComplexMatrixEigenvalues(Obj self, Obj mat)
   MatrixXcd *A = GET_EIGENCOMPLEXMATRIX(mat);
   ComplexEigenSolver<MatrixXcd> es(*A);
 
-  int dimension = 2;
+  long dimension = 2;
   int i, j;
 
 //  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
@@ -546,7 +577,7 @@ Obj Eigensolver(Obj self, Obj mat)
   if ( ! IS_PLIST(mat))
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
-  int dimension = LEN_PLIST(mat);
+  long dimension = LEN_PLIST(mat);
 
   MatrixXd A(dimension, dimension);
   int i, j;
@@ -613,46 +644,13 @@ Obj Eigensolver(Obj self, Obj mat)
 
 
 
-Obj EigenEigenvalues(Obj self, Obj mat)
-{
-
-  if (! IS_EIGENMATRIX(mat))
-          ErrorMayQuit( "Error: Must give an Eigen type matrix", 0, 0 );
-
-  MatrixXd *A = GET_EIGENMATRIX(mat);
-  EigenSolver<MatrixXd> es(*A);
-
-  int dimension = 2;
-  int i, j;
-
-//  cout << "Here is the matrix you entered:" << endl << A << endl << endl;
-
-//  cout << "The eigenvalues of A are:" << endl << es.eigenvalues() << endl;
-//  cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
-
-  Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(eigenvalues, dimension);
-  for (i = 0; i < dimension; i = i+1){
-    Obj complex_value = NEW_PLIST(T_PLIST, 2);
-    SET_LEN_PLIST(complex_value, 2);
-    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
-    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
-    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
-  }
-
-  return eigenvalues;
-
-}
-
-
-
 Obj EigenEigenvectors(Obj self, Obj mat)
 {
 
   if ( ! IS_PLIST(mat))
           ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
 
-  int dimension = LEN_PLIST(mat);
+  long dimension = LEN_PLIST(mat);
 
   MatrixXd A(dimension, dimension);
   int i, j;
@@ -726,11 +724,11 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfComplexHermitianMatrix, 3, "mat, dim, tol"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfRealSymmetricMatrix, 3, "mat, dim, tol"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SpectrumOfRealMatrix, 2, "mat, dim"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixEigenvalues, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
 

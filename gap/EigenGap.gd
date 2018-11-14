@@ -70,9 +70,18 @@ DeclareOperation( "SignatureOfComplexHermitianMatrix",
 #! @Returns Signature
 #! @Description
 #!	Same as 'SignatureOfComplexHermitianMatrix' but without checking that the matrix is a hermitian complex matrix.
-
 DeclareOperation( "SignatureOfComplexHermitianMatrixNC",
 	[ IsList ]);
 
 DeclareOperation( "SignatureOfComplexHermitianMatrixNC",
 	[ IsList, IsFloat ]);
+
+
+#! @Chapter Using EigenGAP
+#! @Section Spectrums
+#! @Arguments RealMatrix
+#! @Returns Spectrum
+#! @Description
+#!	Returns a list of all the eigenvalues (including duplicates), where each eigenvalue is a pair [a, b], denoting a + bi.
+DeclareOperation( "SpectrumOfRealMatrix",
+	[ IsList ]);

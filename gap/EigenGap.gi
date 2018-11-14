@@ -157,3 +157,13 @@ InstallMethod(SignatureOfComplexHermitianMatrixNC, "",
 		return __SignatureOfComplexHermitianMatrix( mat2 , Size(mat), tol );
 	end
 );
+
+
+InstallMethod(SpectrumOfRealMatrix, "",
+	[ IsList ] ,
+	function(mat)
+		local mat2;
+		mat2 := EigenRealMatrix(mat);
+		return __SpectrumOfRealMatrix( mat2, Size(mat) );
+	end
+);
