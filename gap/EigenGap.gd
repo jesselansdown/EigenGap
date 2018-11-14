@@ -40,7 +40,6 @@ DeclareOperation( "SignatureOfRealSymmetricMatrix",
 #! @Returns Signature
 #! @Description
 #!	Same as 'SignatureOfRealSymmetricMatrix' but without checking that the matrix is a real symmetric matrix.
-
 DeclareOperation( "SignatureOfRealSymmetricMatrixNC",
 	[ IsList ]);
 
