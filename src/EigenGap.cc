@@ -336,7 +336,7 @@ Obj __SignatureOfRealSymmetricMatrix(Obj self, Obj mat, Obj dim, Obj tol)
   int pos = 0;
   int neg = 0;
   int null = 0;
-  int tol2 = VAL_MACFLOAT(tol);
+  double tol2 = VAL_MACFLOAT(tol);
 
   for (i = 0; i < dimension; i = i+1){
     val = es.eigenvalues().col(0)[i].real();
