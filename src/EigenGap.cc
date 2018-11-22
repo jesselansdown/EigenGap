@@ -293,7 +293,7 @@ Obj __SignatureOfComplexHermitianMatrix(Obj self, Obj mat, Obj dim, Obj tol)
   int n0 =0;
   int nplus = 0;
   int nminus =0;
-  int tol2 = VAL_MACFLOAT(tol);
+  double tol2 = VAL_MACFLOAT(tol);
 
   for (i = 0; i < dimension; i = i+1){
     if (es.eigenvalues().col(0)[i].real() > tol2)
