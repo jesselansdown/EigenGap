@@ -51,3 +51,10 @@ InstallMethod(ApproximateRankOfRealMatrix, "",
 		return __ApproximateRankOfRealMatrix(Float(A));
 	end
 );
+
+InstallMethod(ApproximateKernelAndImageOfRealMatrix, "",
+	[ IsList ] ,
+	function(A)
+		return __ApproximateKernelAndImageOfRealMatrix(Float(A));
+	end
+);

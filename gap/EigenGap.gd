@@ -54,8 +54,19 @@ DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
 #! @Chapter Using EigenGAP
 #! @Section Functionality
 #! @Arguments M
-#! @Returns Eigenvectors
+#! @Returns Rank
 #! @Description
 #!	Takes a real matrix and returns the rank. A tolerance of 10^(-5) is used.
 DeclareOperation( "ApproximateRankOfRealMatrix",
+	[ IsList ]);
+
+#! @Chapter Using EigenGAP
+#! @Section Functionality
+#! @Arguments M
+#! @Returns [Kernel, Image]
+#! @Description
+#!	Returns the kernel and image of a real matrix M, where vectors are multplied on the right, Mx.
+#!  The rows of the kernel correspond to vectors in the kernel, and the rows in the image correspond to vectors in the image.
+#!  Entries in the vectors are approximated as floating point values.
+DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
 	[ IsList ]);

@@ -264,6 +264,82 @@ Obj __ApproximateRankOfRealMatrix(Obj self, Obj mat)
   return INTOBJ_INT(rank);
 }
 
+Obj __ApproximateKernelAndImageOfRealMatrix(Obj self, Obj mat)
+{
+
+  if ( ! IS_PLIST(mat))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  if ( ! IS_PLIST(ELM_PLIST(mat, 1)))
+          ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+
+  int nrows = LEN_PLIST(mat);
+  int ncols = LEN_PLIST(ELM_PLIST(mat, 1));
+
+
+  MatrixXd A = MatrixXd(nrows, ncols);
+  int i, j;
+
+  for (i = 0; i < nrows; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < ncols; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_MACFLOAT(entry_ij) ){
+          A(i, j) = VAL_MACFLOAT(entry_ij);
+        }
+        else
+          ErrorMayQuit( "Error: Matrix may only contain floats.", 0, 0 ); 
+    }
+  }
+
+  FullPivLU<MatrixXd> lu_decomp(A);
+
+  Obj solution = NEW_PLIST(T_PLIST, 2);
+  SET_LEN_PLIST(solution, 2);
+
+  MatrixXd ker = MatrixXd();
+  ker = lu_decomp.kernel();
+
+  MatrixXd im = MatrixXd();
+  im = lu_decomp.image(A);
+
+  long kernelcols = ker.cols();
+  long imagecols = im.cols();
+
+
+  Obj kernel = NEW_PLIST(T_PLIST, kernelcols);
+  SET_LEN_PLIST(kernel, kernelcols);
+  for (i = 0; i < kernelcols; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
+    SET_LEN_PLIST(current_solution_row, nrows);
+    for (j = 0; j < nrows; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(ker.row(j)[i]));
+    }
+    SET_ELM_PLIST(kernel, i+1, current_solution_row);
+  }
+
+  Obj image = NEW_PLIST(T_PLIST, imagecols);
+  SET_LEN_PLIST(image, imagecols);
+  for (i = 0; i < imagecols; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
+    SET_LEN_PLIST(current_solution_row, nrows);
+    for (j = 0; j < nrows; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(im.row(j)[i]));
+    }
+    SET_ELM_PLIST(image, i+1, current_solution_row);
+  }
+
+  SET_ELM_PLIST(solution, 1, kernel);
+  SET_ELM_PLIST(solution, 2,  image);
+
+  return solution;
+
+}
+
+
 typedef Obj (* GVarFunc)(/*arguments*/);
 
 #define GVAR_FUNC_TABLE_ENTRY(srcfile, name, nparam, params) \
@@ -279,6 +355,7 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateEigenvectorsOfRealSymmetricMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateEigenvectorsOfRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateRankOfRealMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateKernelAndImageOfRealMatrix, 1, "mat"),
 
 	{ 0 } /* Finish with an empty entry */
 
