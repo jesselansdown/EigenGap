@@ -23,4 +23,31 @@ InstallMethod(ApproximateEigenvaluesOfRealMatrix, "",
 	end
 );
 
+InstallMethod(ApproximateEigenvectorsOfRealSymmetricMatrix, "",
+	[ IsList ] ,
+	function(A)
+		if TransposedMat(A)<>A then
+			Print("Warning! This method only works for symmetric real matrices!\n");
+		fi;
+		return __ApproximateEigenvectorsOfRealSymmetricMatrix(Float(A));
+	end
+);
 
+
+InstallMethod(ApproximateEigenvectorsOfRealMatrix, "",
+	[ IsList ] ,
+	function(A)
+		if TransposedMat(A)<>A then
+			Print("Warning! This method only works for symmetric real matrices!\n");
+		fi;
+		return __ApproximateEigenvectorsOfRealMatrix(Float(A));
+	end
+);
+
+
+InstallMethod(ApproximateRankOfRealMatrix, "",
+	[ IsList ] ,
+	function(A)
+		return __ApproximateRankOfRealMatrix(Float(A));
+	end
+);
