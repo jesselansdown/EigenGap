@@ -15,7 +15,7 @@
 #!  Note that the matrix must be symmetric. This is not checked. A warning is given if the transpose of the
 #!  matrix is not equal to the matrix, however this allowed, since the matrix may contain floating point values.
 DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
 
 #! @Chapter Using EigenGAP
 #! @Section Functionality
@@ -26,7 +26,7 @@ DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
 #!  where each pair [a, b] represents a complex number of the form a + bi.
 #!  Values in matrix can be integers, fractions, or floating point values.
 DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
 
 #! @Chapter Using EigenGAP
 #! @Section Functionality
@@ -38,7 +38,7 @@ DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
 #!  Note that the matrix must be symmetric. This is not checked. A warning is given if the transpose of the
 #!  matrix is not equal to the matrix, however this allowed, since the matrix may contain floating point values.
 DeclareOperation( "ApproximateEigenvectorsOfRealSymmetricMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
 
 #! @Chapter Using EigenGAP
 #! @Section Functionality
@@ -49,7 +49,7 @@ DeclareOperation( "ApproximateEigenvectorsOfRealSymmetricMatrix",
 #!  where each pair [a, b] represents a complex number of the form a + bi.
 #!  Values in matrix can be integers, fractions, or floating point values.
 DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
 
 #! @Chapter Using EigenGAP
 #! @Section Functionality
@@ -58,7 +58,7 @@ DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
 #! @Description
 #!	Takes a real matrix and returns the rank. A tolerance of 10^(-5) is used.
 DeclareOperation( "ApproximateRankOfRealMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
 
 #! @Chapter Using EigenGAP
 #! @Section Functionality
@@ -69,4 +69,4 @@ DeclareOperation( "ApproximateRankOfRealMatrix",
 #!  The rows of the kernel correspond to vectors in the kernel, and the rows in the image correspond to vectors in the image.
 #!  Entries in the vectors are approximated as floating point values.
 DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
-	[ IsList ]);
+	[ IsMatrixObj ]);
