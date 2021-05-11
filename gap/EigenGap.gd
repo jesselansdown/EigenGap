@@ -6,19 +6,22 @@
 
 
 #! @Chapter Using EigenGAP
-#! @Section Spectrums
-#! @Arguments RealMatrix
-#! @Returns Spectrum
+#! @Section Eigenvalues
+#! @Arguments M
+#! @Returns Eigenvalues
 #! @Description
-#!	Returns a list of all the eigenvalues (including duplicates), where each eigenvalue is a pair [a, b], denoting a + bi.
+#!	Takes a symmetric real matrix and returns the eigenvalues approximated as floating point values.
+#!  Note that the matrix must be symmetric. This is not checked, however.
+#!  Values in matrix can be integers, fractions, or floating point values.
 DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
 	[ IsList ]);
 
 #! @Chapter Using EigenGAP
-#! @Section Spectrums
-#! @Arguments RealMatrix
-#! @Returns Spectrum
+#! @Section Eigenvalues
+#! @Arguments M
+#! @Returns Eigenvalues
 #! @Description
-#!	Returns a list of all the eigenvalues (including duplicates), where each eigenvalue is a pair [a, b], denoting a + bi.
+#!	Takes a real matrix and returns the eigenvalues approximated as floating point values.
+#!  Values in matrix can be integers, fractions, or floating point values.
 DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
 	[ IsList ]);
