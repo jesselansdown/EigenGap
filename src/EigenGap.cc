@@ -128,18 +128,6 @@ typedef Obj (* GVarFunc)(/*arguments*/);
 
 // Table of functions to export
 static StructGVarFunc GVarFuncs [] = {
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRealMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ViewEigenMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfComplexHermitianMatrix, 3, "mat, dim, tol"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SignatureOfRealSymmetricMatrix, 3, "mat, dim, tol"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __SpectrumOfRealMatrix, 2, "mat, dim"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenSolutionMat, 2, "mat, vec"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", ReverseEigenMatrix, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenRank, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", Eigensolver, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenComplexMatrixEigenvalues, 1, "mat"),
-    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", EigenEigenvectors, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateEigenvaluesOfRealSymmetricMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateEigenvaluesOfRealMatrix, 1, "mat"),
 
@@ -154,34 +142,6 @@ static Int InitKernel( StructInitInfo *module )
 {
     /* init filters and functions                                          */
     InitHdlrFuncsFromTable( GVarFuncs );
-
-  
-    InitCopyGVar( "TheTypeEigenMatrix", &TheTypeEigenMatrix );
-
-
-  T_EIGEN = RegisterPackageTNUM("EigenMatrix", EigenTypeFunc);
-
-    InitMarkFuncBags(T_EIGEN, &MarkNoSubBags);
-    InitFreeFuncBag(T_EIGEN, &EigenFreeFunc);
-
-    CopyObjFuncs[ T_EIGEN ] = &EigenCopyFunc;
-    CleanObjFuncs[ T_EIGEN ] = &EigenCleanFunc;
-  IsMutableObjFuncs[ T_EIGEN ] = &EigenIsMutableObjFuncs;
-
-
-
-  
-    InitCopyGVar( "TheTypeEigenComplexMatrix", &TheTypeEigenComplexMatrix );
-
-
-  T_EIGENCOMPLEXMATRIX = RegisterPackageTNUM("EigenMatrix", EigenComplexMatrixTypeFunc);
-
-    InitMarkFuncBags(T_EIGENCOMPLEXMATRIX, &MarkNoSubBags);
-    InitFreeFuncBag(T_EIGENCOMPLEXMATRIX, &EigenComplexMatrixFreeFunc);
-
-    CopyObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenComplexMatrixCopyFunc;
-    CleanObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenCleanFunc;
-  IsMutableObjFuncs[ T_EIGENCOMPLEXMATRIX ] = &EigenIsMutableObjFuncs;
 
     return 0;
 }
