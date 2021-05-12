@@ -29,7 +29,7 @@ InstallMethod(ApproximateEigenvectorsOfRealSymmetricMatrix, "",
 		if TransposedMat(A)<>A then
 			Print("Warning! This method only works for symmetric real matrices!\n");
 		fi;
-		return __ApproximateEigenvectorsOfRealSymmetricMatrix(Float(TransposedMat(A)));
+		return __ApproximateEigenvectorsOfRealSymmetricMatrix(Float(A));
 	end
 );
 
@@ -52,6 +52,7 @@ InstallMethod(ApproximateRankOfRealMatrix, "",
 	end
 );
 
+
 InstallMethod(ApproximateKernelAndImageOfRealMatrix, "",
 	[ IsMatrixObj ] ,
 	function(A)
@@ -59,12 +60,14 @@ InstallMethod(ApproximateKernelAndImageOfRealMatrix, "",
 	end
 );
 
+
 InstallMethod(ApproximateSolutionMat, "",
 	[ IsMatrixObj, IsMatrixObj ] ,
 	function(A,B)
 		return __ApproximateSolutionMat(Float(TransposedMat(A)), Float(TransposedMat(B)));
 	end
 );
+
 
 InstallOtherMethod(ApproximateSolutionMat, "",
 	[ IsMatrixObj, IsList ] ,
