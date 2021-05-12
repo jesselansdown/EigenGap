@@ -66,7 +66,7 @@ InstallMethod(ApproximateSolutionMat, "",
 	end
 );
 
-InstallMethod(ApproximateSolutionMat, "",
+InstallOtherMethod(ApproximateSolutionMat, "",
 	[ IsMatrixObj, IsList ] ,
 	function(A, B)
 		return TransposedMat(__ApproximateSolutionMat(Float(A), Float(TransposedMat([B]))))[1];
