@@ -1,0 +1,60 @@
+@Chapter Using EigenGap
+	@Section Welcome to EigenGap
+
+
+@Chapter Introduction
+	@Section Welcome to EigenGap
+
+EigenGap is a &GAP;<Cite Key="GAP4"/> is an interface to the C++ library, Eigen <Cite Key="Eigen"/>
+
+The current version of the Eigen library included in EigenGap is version 3.3.9
+
+	@Section Citing EigenGap
+
+	TODO
+
+	@Section Dependencies
+
+EigenGap requires
+
+* &GAP; 4.8 (or later)
+
+	@Section Installation
+
+To install EigenGap, copy to the "pkg" directory of your GAP installation, unzip and run the following commands from the terminal:
+
+		./autogen.sh
+		./configure [--with-gaproot=\<gap path>]
+		make
+
+If you wish to regenerate the documentation do
+
+		gap.sh makedoc.g
+
+Alternatively, you may load the package from a location other than the &GAP; "pkg" directory by using the -L flag when opening &GAP;. Note that this requires the parent directory of EigenGap to be called "pkg". See the &GAP; documentation for more details on how to do this. This is useful, for example, when administrative priveledges are required to access the &GAP; root directory.
+
+
+@Chapter Getting Started
+	@Section Tutorial - A first session with EigenGap
+	TODO
+
+@Chapter Functionality
+	@Section Eigenvalues
+	@Section Eigenvectors
+	@Section Other matrix properties
+	@Section Solving equations
+	@Section Helper functions
+
+@Chapter Examples
+
+TODO
+
+@Chapter Appendix
+
+	@Section EigenGap Links
+
+	TODO
+
+	@Section &GAP; Links
+
+* Homepage: http://gap-system.org
