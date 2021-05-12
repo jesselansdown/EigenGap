@@ -70,3 +70,13 @@ DeclareOperation( "ApproximateRankOfRealMatrix",
 #!  Entries in the vectors are approximated as floating point values.
 DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
 	[ IsMatrixObj ]);
+
+#! @Chapter Using EigenGAP
+#! @Section Functionality
+#! @Arguments A, B
+#! @Returns X
+#! @Description
+#!  Given real matrices A and B, solves for AX = B where X is approximated with floating point entries.
+#!  If B is a vector (given as a list, rather than a matrix) then ApproximateSolutionMat behaves the same way as SolutionMat.
+DeclareOperation( "ApproximateSolutionMat",
+	[ IsMatrixObj , IsMatrixObj]);

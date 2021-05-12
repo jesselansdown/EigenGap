@@ -340,6 +340,83 @@ Obj __ApproximateKernelAndImageOfRealMatrix(Obj self, Obj mat)
 }
 
 
+
+Obj __ApproximateSolutionMat(Obj self, Obj mat, Obj mat2)
+{
+
+
+  int i, j;
+  int nrowsA = LEN_PLIST(mat);
+  int ncolsA = LEN_PLIST(ELM_PLIST(mat, 1));
+
+
+  MatrixXd A = MatrixXd(nrowsA, ncolsA);
+
+  for (i = 0; i < nrowsA; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < ncolsA; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_MACFLOAT(entry_ij) ){
+          A(i, j) = VAL_MACFLOAT(entry_ij);
+        }
+        else
+          ErrorMayQuit( "A may only contain floats.", 0, 0 ); 
+    }
+  }
+
+  int nrowsB = LEN_PLIST(mat2);
+  int ncolsB = LEN_PLIST(ELM_PLIST(mat2, 1));
+
+
+  MatrixXd B = MatrixXd(nrowsB, ncolsB);
+
+  for (i = 0; i < nrowsB; i = i+1){
+    Obj row = ELM_PLIST(mat2, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < ncolsB; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_MACFLOAT(entry_ij) ){
+          B(i, j) = VAL_MACFLOAT(entry_ij);
+        }
+        else
+          ErrorMayQuit( "B may only contain floats.", 0, 0 ); 
+    }
+  }
+
+  if ( nrowsA != nrowsB )
+    ErrorMayQuit( "Error: matrix A and matrix B must have compatible dimensions in the equation Ax = b!", 0, 0 );
+
+  MatrixXd x = MatrixXd();
+  x = A.colPivHouseholderQr().solve(B);
+
+  double relative_error = (A*x - B).norm() / B.norm(); // norm() is L2 norm
+  cout << "The relative error is:\n" << relative_error << endl;
+
+
+  long nsolrows = x.rows();
+  long nsolcols = x.cols();
+
+  Obj solution = NEW_PLIST(T_PLIST, nsolrows);
+  SET_LEN_PLIST(solution, nsolrows);
+  for (i = 0; i < nsolrows; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, nsolcols);
+    SET_LEN_PLIST(current_solution_row, nsolcols);
+    for (j = 0; j < nsolcols; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
+    }
+    SET_ELM_PLIST(solution, i+1, current_solution_row);
+  }
+  return solution;
+}
+
+
 typedef Obj (* GVarFunc)(/*arguments*/);
 
 #define GVAR_FUNC_TABLE_ENTRY(srcfile, name, nparam, params) \
@@ -356,6 +433,7 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateEigenvectorsOfRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateRankOfRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateKernelAndImageOfRealMatrix, 1, "mat"),
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateSolutionMat, 2, "mat, mat2"),
 
 	{ 0 } /* Finish with an empty entry */
 
