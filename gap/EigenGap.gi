@@ -37,9 +37,6 @@ InstallMethod(ApproximateEigenvectorsOfRealSymmetricMatrix, "",
 InstallMethod(ApproximateEigenvectorsOfRealMatrix, "",
 	[ IsMatrixObj ] ,
 	function(A)
-		if TransposedMat(A)<>A then
-			Print("Warning! This method only works for symmetric real matrices!\n");
-		fi;
 		return __ApproximateEigenvectorsOfRealMatrix(Float(TransposedMat(A)));
 	end
 );
