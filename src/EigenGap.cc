@@ -160,7 +160,7 @@ Obj __ApproximateEigenvectorsOfRealSymmetricMatrix(Obj self, Obj mat)
     Obj current_eigenvector = NEW_PLIST(T_PLIST, dimension);
     SET_LEN_PLIST(current_eigenvector, dimension);
     for (j = 0; j < dimension; j = j+1){
-      SET_ELM_PLIST(current_eigenvector, j+1, NEW_MACFLOAT(es.eigenvectors().row(j)[i]));
+      SET_ELM_PLIST(current_eigenvector, j+1, NEW_MACFLOAT(es.eigenvectors().row(i)[j]));
     }
     SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
   }
@@ -204,7 +204,7 @@ Obj __ApproximateEigenvectorsOfRealMatrix(Obj self, Obj mat)
 
   EigenSolver<MatrixXd> es(A);
 
-    Obj eigenvectors = NEW_PLIST(T_PLIST, dimension);
+  Obj eigenvectors = NEW_PLIST(T_PLIST, dimension);
   SET_LEN_PLIST(eigenvectors, dimension);
   for (i = 0; i < dimension; i = i+1){
 
@@ -213,8 +213,8 @@ Obj __ApproximateEigenvectorsOfRealMatrix(Obj self, Obj mat)
     for (j = 0; j < dimension; j = j+1){
       Obj complex_value = NEW_PLIST(T_PLIST, 2);
       SET_LEN_PLIST(complex_value, 2);
-      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(j)[i].real()));
-      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(j)[i].imag()));
+      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(i)[j].real()));
+      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(i)[j].imag()));
       SET_ELM_PLIST(current_eigenvector, j+1, complex_value);
     }
     SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
@@ -310,24 +310,24 @@ Obj __ApproximateKernelAndImageOfRealMatrix(Obj self, Obj mat)
   long imagecols = im.cols();
 
 
-  Obj kernel = NEW_PLIST(T_PLIST, kernelcols);
-  SET_LEN_PLIST(kernel, kernelcols);
-  for (i = 0; i < kernelcols; i = i+1){
-    Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
-    SET_LEN_PLIST(current_solution_row, nrows);
-    for (j = 0; j < nrows; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(ker.row(j)[i]));
+  Obj kernel = NEW_PLIST(T_PLIST, nrows);
+  SET_LEN_PLIST(kernel, nrows);
+  for (i = 0; i < nrows; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, kernelcols);
+    SET_LEN_PLIST(current_solution_row, kernelcols);
+    for (j = 0; j < kernelcols; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(ker.row(i)[j]));
     }
     SET_ELM_PLIST(kernel, i+1, current_solution_row);
   }
 
-  Obj image = NEW_PLIST(T_PLIST, imagecols);
-  SET_LEN_PLIST(image, imagecols);
-  for (i = 0; i < imagecols; i = i+1){
-    Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
-    SET_LEN_PLIST(current_solution_row, nrows);
-    for (j = 0; j < nrows; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(im.row(j)[i]));
+  Obj image = NEW_PLIST(T_PLIST, nrows);
+  SET_LEN_PLIST(image, nrows);
+  for (i = 0; i < nrows; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, imagecols);
+    SET_LEN_PLIST(current_solution_row, imagecols);
+    for (j = 0; j < imagecols; j = j+1 ){
+      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(im.row(i)[j]));
     }
     SET_ELM_PLIST(image, i+1, current_solution_row);
   }
