@@ -17,7 +17,7 @@
 DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Functonality
+#! @Chapter Functionality
 #! @Section Eigenvalues
 #! @Arguments M
 #! @Returns Eigenvalues
