@@ -24,7 +24,7 @@ EigenGap requires
 To install EigenGap, copy to the "pkg" directory of your GAP installation, unzip and run the following commands from the terminal:
 
 		./autogen.sh
-		./configure [--with-gaproot=\<gap path>]
+		./configure [--with-gaproot=gap path]
 		make
 
 If you wish to regenerate the documentation do
