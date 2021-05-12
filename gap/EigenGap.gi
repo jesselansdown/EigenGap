@@ -75,3 +75,14 @@ InstallOtherMethod(ApproximateSolutionMat, "",
 		return TransposedMat(__ApproximateSolutionMat(Float(TransposedMat(A)), Float(TransposedMat([B]))))[1];
 	end
 );
+
+InstallMethod(WithinEpsilon, "",
+	[ IsFloat, IsFloat, IsFloat ] ,
+	function( x, y, epsilon )
+		if AbsoluteValue( x - y ) < AbsoluteValue( epsilon ) then
+			return true;
+		else
+			return false;
+		fi;
+	end
+);

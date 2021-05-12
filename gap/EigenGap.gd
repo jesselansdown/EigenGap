@@ -5,8 +5,8 @@
 #
 
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Eigenvalues
 #! @Arguments M
 #! @Returns Eigenvalues
 #! @Description
@@ -17,8 +17,8 @@
 DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functonality
+#! @Section Eigenvalues
 #! @Arguments M
 #! @Returns Eigenvalues
 #! @Description
@@ -28,8 +28,8 @@ DeclareOperation( "ApproximateEigenvaluesOfRealSymmetricMatrix",
 DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Eigenvectors
 #! @Arguments M
 #! @Returns Eigenvectors
 #! @Description
@@ -40,8 +40,8 @@ DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
 DeclareOperation( "ApproximateEigenvectorsOfRealSymmetricMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Eigenvectors
 #! @Arguments M
 #! @Returns Eigenvectors
 #! @Description
@@ -51,8 +51,8 @@ DeclareOperation( "ApproximateEigenvectorsOfRealSymmetricMatrix",
 DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Other matrix properties
 #! @Arguments M
 #! @Returns Rank
 #! @Description
@@ -60,8 +60,8 @@ DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
 DeclareOperation( "ApproximateRankOfRealMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Other matrix properties
 #! @Arguments M
 #! @Returns [Kernel, Image]
 #! @Description
@@ -71,8 +71,8 @@ DeclareOperation( "ApproximateRankOfRealMatrix",
 DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
 	[ IsMatrixObj ]);
 
-#! @Chapter Using EigenGAP
-#! @Section Functionality
+#! @Chapter Functionality
+#! @Section Solving equations
 #! @Arguments A, B
 #! @Returns X
 #! @Description
@@ -80,3 +80,13 @@ DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
 #!  If B is a vector (given as a list, rather than a matrix) then ApproximateSolutionMat behaves the same way as SolutionMat.
 DeclareOperation( "ApproximateSolutionMat",
 	[ IsMatrixObj , IsMatrixObj]);
+
+#! @Chapter Functionality
+#! @Section Helper functions
+#! @Arguments x, y, epsilon
+#! @Returns true or false
+#! @Description
+#!  Given two floating point values x and y, returns true if x is within epsilon of y and false
+#!  otherwise, for some floating point value epsilon.
+DeclareOperation( "WithinEpsilon",
+	[ IsFloat , IsFloat, IsFloat]);

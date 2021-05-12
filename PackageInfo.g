@@ -6,12 +6,13 @@
 # manual of the "Example" package as well as the comments in its
 # PackageInfo.g file.
 #
+
 SetPackageInfo( rec(
 
 PackageName := "EigenGap",
 Subtitle := "Use the Eigen C++ library within GAP",
 Version := "0.1",
-Date := "21/07/2017", # dd/mm/yyyy format
+Date := "12/05/2021", # dd/mm/yyyy format
 
 Persons := [
   rec(
@@ -20,14 +21,14 @@ Persons := [
     FirstNames := "Jesse",
     LastName := "Lansdown",
     WWWHome := "http://www.jesselansdown.com",
-    Email := "jesse.lansdown@research.uwa.edu.au",
+    Email := "jesse.lansdown@uwa.edu.au",
     PostalAddress := Concatenation(
                "Jesse Lansdown\n",
-               "Lehrstuhl B für Mathematik\n",
-               "RWTH Aachen University\n",
-               "Pontdriesch 10 - 16\n",
-               "52062 Aachen\n",
-               "Germany" ),
+               "Centre for the Mathematics of Symmetry and Computation\n",
+               "The University of Western Australia\n",
+               "35 Stirling Highway\n",
+               "PERTH WA 6009\n",
+               "Australia" ),
     Place := "Aachen",
     Institution := "The University of Western Australia/RWTH Aachen University",
   ),
@@ -81,6 +82,15 @@ AvailabilityTest := function()
 TestFile := "tst/testall.g",
 
 #Keywords := [ "TODO" ],
+
+AutoDoc := rec(
+    TitlePage := rec(
+        Copyright := Concatenation("&copyright; 2017 - 2021 Jesse Lansdown<P/>\n\n",
+        "TODO - License\n"),
+        Abstract := Concatenation("EigenGap is an interface to the C++ library, Eigen, providing basic linear algebra capabilities to GAP usng floating point arithmatic"),
+        Acknowledgements := Concatenation("TODO")
+    )
+),
 
 ));
 
