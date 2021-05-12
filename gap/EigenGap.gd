@@ -33,7 +33,7 @@ DeclareOperation( "ApproximateEigenvaluesOfRealMatrix",
 #! @Arguments M
 #! @Returns Eigenvectors
 #! @Description
-#!	Takes a symmetric real matrix and returns the eigenvectors with entries approximated as floating point values.
+#!	Takes a symmetric real matrix and returns the (left) eigenvectors with entries approximated as floating point values.
 #!  Values in matrix can be integers, fractions, or floating point values.
 #!  Note that the matrix must be symmetric. This is not checked. A warning is given if the transpose of the
 #!  matrix is not equal to the matrix, however this allowed, since the matrix may contain floating point values.
@@ -45,7 +45,7 @@ DeclareOperation( "ApproximateEigenvectorsOfRealSymmetricMatrix",
 #! @Arguments M
 #! @Returns Eigenvectors
 #! @Description
-#!	Takes a real sqyare matrix and returns the eigenvectors with entries approximated as pairs of floating point values, where
+#!	Takes a real sqyare matrix and returns the (left) eigenvectors with entries approximated as pairs of floating point values, where
 #!  where each pair [a, b] represents a complex number of the form a + bi.
 #!  Values in matrix can be integers, fractions, or floating point values.
 DeclareOperation( "ApproximateEigenvectorsOfRealMatrix",
@@ -65,7 +65,7 @@ DeclareOperation( "ApproximateRankOfRealMatrix",
 #! @Arguments M
 #! @Returns [Kernel, Image]
 #! @Description
-#!	Returns the kernel and image of a real matrix M, where vectors are multplied on the right, Mx.
+#!	Returns the (left) kernel and image of a real matrix M.
 #!  The rows of the kernel correspond to vectors in the kernel, and the rows in the image correspond to vectors in the image.
 #!  Entries in the vectors are approximated as floating point values.
 DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
@@ -76,7 +76,7 @@ DeclareOperation( "ApproximateKernelAndImageOfRealMatrix",
 #! @Arguments A, B
 #! @Returns X
 #! @Description
-#!  Given real matrices A and B, solves for AX = B where X is approximated with floating point entries.
+#!  Given real matrices A and B, solves for XA = B where X is approximated with floating point entries.
 #!  If B is a vector (given as a list, rather than a matrix) then ApproximateSolutionMat behaves the same way as SolutionMat.
 DeclareOperation( "ApproximateSolutionMat",
 	[ IsMatrixObj , IsMatrixObj]);
