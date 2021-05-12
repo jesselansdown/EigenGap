@@ -87,8 +87,8 @@ AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation("&copyright; 2017 - 2021 Jesse Lansdown<P/>\n\n",
         "TODO - License\n"),
-        Abstract := Concatenation("EigenGap is an interface to the C++ library, Eigen, providing basic linear algebra capabilities to GAP usng floating point arithmatic"),
-        Acknowledgements := Concatenation("TODO")
+        Abstract := "EigenGap is an interface to the C++ library, Eigen, providing basic linear algebra capabilities to GAP usng floating point arithmatic",
+        Acknowledgements := "TODO"
     )
 ),
 
