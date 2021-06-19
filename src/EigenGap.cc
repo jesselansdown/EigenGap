@@ -58,9 +58,8 @@ Obj __ApproximateEigenvaluesOfRealSymmetricMatrix(Obj self, Obj mat)
   SelfAdjointEigenSolver<MatrixXd> es(A);
 
   Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(eigenvalues, dimension);
   for (i = 0; i < dimension; i = i+1){
-    SET_ELM_PLIST(eigenvalues, i+1, NEW_MACFLOAT(es.eigenvalues().col(0)[i]));
+    ASS_LIST(eigenvalues, i+1, NEW_MACFLOAT(es.eigenvalues().col(0)[i]));
   }
 
   return eigenvalues;
@@ -103,13 +102,11 @@ Obj __ApproximateEigenvaluesOfRealMatrix(Obj self, Obj mat)
   EigenSolver<MatrixXd> es(A);
 
   Obj eigenvalues = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(eigenvalues, dimension);
   for (i = 0; i < dimension; i = i+1){
     Obj complex_value = NEW_PLIST(T_PLIST, 2);
-    SET_LEN_PLIST(complex_value, 2);
-    SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
-    SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
-    SET_ELM_PLIST(eigenvalues, i+1, complex_value);
+    ASS_LIST(complex_value, 1, NEW_MACFLOAT(es.eigenvalues().col(0)[i].real()));
+    ASS_LIST(complex_value, 2, NEW_MACFLOAT(es.eigenvalues().col(0)[i].imag()));
+    ASS_LIST(eigenvalues, i+1, complex_value);
   }
 
   return eigenvalues;
@@ -154,15 +151,13 @@ Obj __ApproximateEigenvectorsOfRealSymmetricMatrix(Obj self, Obj mat)
   SelfAdjointEigenSolver<MatrixXd> es(A);
 
   Obj eigenvectors = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(eigenvectors, dimension);
   for (i = 0; i < dimension; i = i+1){
 
     Obj current_eigenvector = NEW_PLIST(T_PLIST, dimension);
-    SET_LEN_PLIST(current_eigenvector, dimension);
     for (j = 0; j < dimension; j = j+1){
-      SET_ELM_PLIST(current_eigenvector, j+1, NEW_MACFLOAT(es.eigenvectors().row(j)[i]));
+      ASS_LIST(current_eigenvector, j+1, NEW_MACFLOAT(es.eigenvectors().row(j)[i]));
     }
-    SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
+    ASS_LIST(eigenvectors, i+1, current_eigenvector);
   }
 
   return eigenvectors;
@@ -205,19 +200,16 @@ Obj __ApproximateEigenvectorsOfRealMatrix(Obj self, Obj mat)
   EigenSolver<MatrixXd> es(A);
 
     Obj eigenvectors = NEW_PLIST(T_PLIST, dimension);
-  SET_LEN_PLIST(eigenvectors, dimension);
   for (i = 0; i < dimension; i = i+1){
 
     Obj current_eigenvector = NEW_PLIST(T_PLIST, dimension);
-    SET_LEN_PLIST(current_eigenvector, dimension);
     for (j = 0; j < dimension; j = j+1){
       Obj complex_value = NEW_PLIST(T_PLIST, 2);
-      SET_LEN_PLIST(complex_value, 2);
-      SET_ELM_PLIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(j)[i].real()));
-      SET_ELM_PLIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(j)[i].imag()));
-      SET_ELM_PLIST(current_eigenvector, j+1, complex_value);
+      ASS_LIST(complex_value, 1, NEW_MACFLOAT(es.eigenvectors().row(j)[i].real()));
+      ASS_LIST(complex_value, 2, NEW_MACFLOAT(es.eigenvectors().row(j)[i].imag()));
+      ASS_LIST(current_eigenvector, j+1, complex_value);
     }
-    SET_ELM_PLIST(eigenvectors, i+1, current_eigenvector);
+    ASS_LIST(eigenvectors, i+1, current_eigenvector);
   }
 
   return eigenvectors;
@@ -298,7 +290,6 @@ Obj __ApproximateKernelAndImageOfRealMatrix(Obj self, Obj mat)
   FullPivLU<MatrixXd> lu_decomp(A);
 
   Obj solution = NEW_PLIST(T_PLIST, 2);
-  SET_LEN_PLIST(solution, 2);
 
   MatrixXd ker = MatrixXd();
   ker = lu_decomp.kernel();
@@ -311,29 +302,25 @@ Obj __ApproximateKernelAndImageOfRealMatrix(Obj self, Obj mat)
 
 
   Obj kernel = NEW_PLIST(T_PLIST, kernelcols);
-  SET_LEN_PLIST(kernel, kernelcols);
   for (i = 0; i < kernelcols; i = i+1){
     Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
-    SET_LEN_PLIST(current_solution_row, nrows);
     for (j = 0; j < nrows; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(ker.row(j)[i]));
+      ASS_LIST(current_solution_row, j+1, NEW_MACFLOAT(ker.row(j)[i]));
     }
-    SET_ELM_PLIST(kernel, i+1, current_solution_row);
+    ASS_LIST(kernel, i+1, current_solution_row);
   }
 
   Obj image = NEW_PLIST(T_PLIST, imagecols);
-  SET_LEN_PLIST(image, imagecols);
   for (i = 0; i < imagecols; i = i+1){
     Obj current_solution_row = NEW_PLIST(T_PLIST, nrows);
-    SET_LEN_PLIST(current_solution_row, nrows);
     for (j = 0; j < nrows; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(im.row(j)[i]));
+      ASS_LIST(current_solution_row, j+1, NEW_MACFLOAT(im.row(j)[i]));
     }
-    SET_ELM_PLIST(image, i+1, current_solution_row);
+    ASS_LIST(image, i+1, current_solution_row);
   }
 
-  SET_ELM_PLIST(solution, 1, kernel);
-  SET_ELM_PLIST(solution, 2,  image);
+  ASS_LIST(solution, 1, kernel);
+  ASS_LIST(solution, 2,  image);
 
   return solution;
 
@@ -404,14 +391,12 @@ Obj __ApproximateSolutionMat(Obj self, Obj mat, Obj mat2)
   long nsolcols = x.cols();
 
   Obj solution = NEW_PLIST(T_PLIST, nsolrows);
-  SET_LEN_PLIST(solution, nsolrows);
   for (i = 0; i < nsolrows; i = i+1){
     Obj current_solution_row = NEW_PLIST(T_PLIST, nsolcols);
-    SET_LEN_PLIST(current_solution_row, nsolcols);
     for (j = 0; j < nsolcols; j = j+1 ){
-      SET_ELM_PLIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
+      ASS_LIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
     }
-    SET_ELM_PLIST(solution, i+1, current_solution_row);
+    ASS_LIST(solution, i+1, current_solution_row);
   }
   return solution;
 }
