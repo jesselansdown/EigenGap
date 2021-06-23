@@ -9,7 +9,7 @@ dnl ##
 dnl ## Setup autoconf
 dnl ##
 AC_PREREQ([2.68])
-AC_INIT([EigenGap], m4_esyscmd([tr -d '\n' < VERSION]))
+AC_INIT([EigenGap], m4_esyscmd([tr -d '\n' < PACKAGEVERSION]))
 AC_CONFIG_SRCDIR([src/EigenGap.cc])
 AC_CONFIG_HEADER([src/pkgconfig.h:cnf/pkgconfig.h.in])
 AC_CONFIG_MACRO_DIR([m4])
@@ -75,7 +75,7 @@ fi
 dnl ##
 dnl ## Rebuild configure if VERSION file changes
 dnl ##
-AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(top_srcdir)/VERSION'])
+AC_SUBST([CONFIG_STATUS_DEPENDENCIES], ['$(top_srcdir)/PACKAGEVERSION'])
 
 dnl ##
 dnl ## Output everything
