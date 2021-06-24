@@ -61,7 +61,7 @@ InstallMethod(ApproximateKernelAndImageOfRealMatrix, "",
 InstallMethod(ApproximateSolutionMat, "",
 	[ IsMatrixObj, IsMatrixObj ] ,
 	function(A,B)
-		return __ApproximateSolutionMat(Float(TransposedMat(A)), Float(TransposedMat(B)));
+		return TransposedMat(__ApproximateSolutionMat(Float(TransposedMat(A)), Float(TransposedMat(B))));
 	end
 );
 
