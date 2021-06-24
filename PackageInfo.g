@@ -29,8 +29,8 @@ Persons := [
                "35 Stirling Highway\n",
                "PERTH WA 6009\n",
                "Australia" ),
-    Place := "Aachen",
-    Institution := "The University of Western Australia/RWTH Aachen University",
+    Place := "Perth",
+    Institution := "The University of Western Australia",
   ),
 ],
 
@@ -87,8 +87,8 @@ AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation("&copyright; 2017 - 2021 Jesse Lansdown<P/>\n\n",
         "TODO - License\n"),
-        Abstract := "EigenGap is an interface to the C++ library, Eigen, providing basic linear algebra capabilities to GAP usng floating point arithmatic",
-        Acknowledgements := "TODO"
+        Abstract := "EigenGap is an interface to the C++ library, Eigen, providing basic linear algebra capabilities to GAP using floating point arithmatic"#,
+#        Acknowledgements := "TODO"
     )
 ),
 

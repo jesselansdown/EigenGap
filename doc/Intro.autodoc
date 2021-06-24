@@ -1,17 +1,8 @@
-@Chapter Using EigenGap
-	@Section Welcome to EigenGap
-
-
 @Chapter Introduction
 	@Section Welcome to EigenGap
 
-EigenGap is a &GAP;<Cite Key="GAP4"/> is an interface to the C++ library, Eigen <Cite Key="Eigen"/>
-
-The current version of the Eigen library included in EigenGap is version 3.3.9
-
-	@Section Citing EigenGap
-
-	TODO
+EigenGap is an interface to the C++ library, Eigen <Cite Key="Eigen"/>, in &GAP;<Cite Key="GAP4"/>.
+The current version of the Eigen library included in EigenGap is version 3.3.9. In particular, it can be used to find eigenvalues, eigenvectors, and solve systems of linear equations. Since the Eigen library uses numerical methods, it does not guarantee the same accuracy as &GAP;'s methods. However, it does have the benefit of a significant increase in speed, particularly with larger matrices. This trade off is often acceptable, such as when investigating problems in algebraic graph theory, for example.
 
 	@Section Dependencies
 
@@ -19,24 +10,32 @@ EigenGap requires
 
 * &GAP; 4.8 (or later)
 
+* Autotools
+
 	@Section Installation
 
 To install EigenGap, copy to the "pkg" directory of your GAP installation, unzip and run the following commands from the terminal:
 
-		./autogen.sh
-		./configure [--with-gaproot=gap path]
-		make
+@BeginLog
+#!  ./install.sh [-g <gap-root>]
+@EndLog
+
+The [&#8208;r &lt;gap path&gt;] is an optional argument, and is not normally necessary if Gurobify is placed in the pkg directory of the &GAP; root directory. If, however, Gurobify is located in a non-root pkg directory, then this argument must be included. It normally looks something like this,
+
+@BeginLog
+#!  -r /opt/gap4r8/
+@EndLog
 
 If you wish to regenerate the documentation do
 
-		gap.sh makedoc.g
+@BeginLog
+#!  gap.sh makedoc.g
+@EndLog
 
-Alternatively, you may load the package from a location other than the &GAP; "pkg" directory by using the -L flag when opening &GAP;. Note that this requires the parent directory of EigenGap to be called "pkg". See the &GAP; documentation for more details on how to do this. This is useful, for example, when administrative priveledges are required to access the &GAP; root directory.
+Alternatively, you may load the package from a location other than the &GAP; "pkg" directory by using the -l flag when opening &GAP;. Note that this requires the parent directory of EigenGap to be called "pkg". See the &GAP; documentation for more details on how to do this. This is useful, for example, when administrative priveledges are required to access the &GAP; root directory.
 
 
 @Chapter Getting Started
-	@Section Tutorial - A first session with EigenGap
-	TODO
 
 @Chapter Functionality
 	@Section Eigenvalues
