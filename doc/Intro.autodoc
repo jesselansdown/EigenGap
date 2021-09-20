@@ -23,7 +23,7 @@ To install EigenGap, copy to the "pkg" directory of your GAP installation, unzip
 The [&#8208;r &lt;gap path&gt;] is an optional argument, and is not normally necessary if Gurobify is placed in the pkg directory of the &GAP; root directory. If, however, Gurobify is located in a non-root pkg directory, then this argument must be included. It normally looks something like this,
 
 @BeginLog
-#!  -r /opt/gap4r8/
+#!  -g /opt/gap4r8/
 @EndLog
 
 If you wish to regenerate the documentation do

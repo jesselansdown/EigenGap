@@ -402,6 +402,49 @@ Obj __ApproximateSolutionMat(Obj self, Obj mat, Obj mat2)
 }
 
 
+Obj __ApproximateInverseOfRealMatrix(Obj self, Obj mat)
+{
+
+  int i, j;
+  int nrowsA = LEN_PLIST(mat);
+  if ( nrowsA != LEN_PLIST(ELM_PLIST(mat, 1)) )
+    ErrorMayQuit( "Error: Must give a square matrix", 0, 0 );
+
+  MatrixXd A = MatrixXd(nrowsA, nrowsA);
+
+  for (i = 0; i < nrowsA; i = i+1){
+    Obj row = ELM_PLIST(mat, i+1);
+    
+    if ( ! IS_PLIST(row) )
+      ErrorMayQuit( "Error: Must give a matrix", 0, 0 );
+  
+    for (j = 0; j < nrowsA; j = j+1){
+      Obj entry_ij = ELM_PLIST(row, j+1);
+        if ( IS_MACFLOAT(entry_ij) ){
+          A(i, j) = VAL_MACFLOAT(entry_ij);
+        }
+        else
+          ErrorMayQuit( "A may only contain floats.", 0, 0 ); 
+    }
+  }
+
+
+  MatrixXd x = MatrixXd();
+  x = A.inverse();
+
+
+  Obj solution = NEW_PLIST(T_PLIST, nrowsA);
+  for (i = 0; i < nrowsA; i = i+1){
+    Obj current_solution_row = NEW_PLIST(T_PLIST, nrowsA);
+    for (j = 0; j < nrowsA; j = j+1 ){
+      ASS_LIST(current_solution_row, j+1, NEW_MACFLOAT(x.row(i)[j]));
+    }
+    ASS_LIST(solution, i+1, current_solution_row);
+  }
+  return solution;
+}
+
+
 typedef Obj (* GVarFunc)(/*arguments*/);
 
 #define GVAR_FUNC_TABLE_ENTRY(srcfile, name, nparam, params) \
@@ -419,7 +462,7 @@ static StructGVarFunc GVarFuncs [] = {
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateRankOfRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateKernelAndImageOfRealMatrix, 1, "mat"),
     GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateSolutionMat, 2, "mat, mat2"),
-
+    GVAR_FUNC_TABLE_ENTRY("EigenGap.c", __ApproximateInverseOfRealMatrix, 1, "mat"),
 	{ 0 } /* Finish with an empty entry */
 
 };

@@ -49,6 +49,16 @@ InstallMethod(ApproximateRankOfRealMatrix, "",
 	end
 );
 
+InstallMethod(ApproximateInverseOfRealMatrix, "",
+	[ IsMatrixObj ] ,
+	function(A)
+		if Size(A)<>Size(A[1]) then
+			Error("Must give a square matrix!\n");
+		fi;
+		return __ApproximateInverseOfRealMatrix(Float(A));
+	end
+);
+
 
 InstallMethod(ApproximateKernelAndImageOfRealMatrix, "",
 	[ IsMatrixObj ] ,

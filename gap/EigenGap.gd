@@ -82,6 +82,14 @@ DeclareOperation( "ApproximateSolutionMat",
 	[ IsMatrixObj , IsMatrixObj]);
 
 #! @Chapter Functionality
+#! @Section Other matrix properties
+#! @Arguments $M$
+#! @Returns $M^{-1}$
+#! @Description
+#!	Takes a real matrix and returns the inverse.
+DeclareOperation( "ApproximateInverseOfRealMatrix",
+	[ IsMatrixObj ]);
+#! @Chapter Functionality
 #! @Section Helper functions
 #! @Arguments x, y, epsilon
 #! @Returns true or false
