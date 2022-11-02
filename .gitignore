@@ -26,7 +26,6 @@ depcomp
 install-sh
 ltmain.sh
 missing
-pkgconfig.h.in
 libtool.m4
 ltoptions.m4
 ltsugar.m4
@@ -34,7 +33,6 @@ ltversion.m4
 lt~obsolete.m4
 .dirstamp
 EigenGap_la-EigenGap.lo
-pkgconfig.h
 stamp-h1
 EigenGap_la-EigenGap.Plo
 EigenGap_la-EigenGap.o

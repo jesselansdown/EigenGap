@@ -11,7 +11,6 @@ dnl ##
 AC_PREREQ([2.68])
 AC_INIT([EigenGap], m4_esyscmd([tr -d '\n' < PACKAGEVERSION]))
 AC_CONFIG_SRCDIR([src/EigenGap.cc])
-AC_CONFIG_HEADERS([src/pkgconfig.h:cnf/pkgconfig.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([cnf])
 
