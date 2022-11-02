@@ -1,0 +1,13 @@
+#
+# Makefile rules for the EigenGap package
+#
+KEXT_NAME = EigenGap
+KEXT_SOURCES = src/EigenGap.cc
+
+KEXT_CXXFLAGS = -I./eigen/
+KEXT_LDFLAGS = -lstdc++
+
+
+# include shared GAP package build system
+GAPPATH = @GAPPATH@
+include Makefile.gappkg

@@ -7,7 +7,6 @@ do
     esac
 done
 
-./autogen.sh
 ./configure --with-gaproot=${gap}
 make
 
