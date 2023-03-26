@@ -9,5 +9,3 @@ fi;
 
 AutoDoc( rec( scaffold := true, autodoc := true ) );
 AutoDoc( rec( maketest := rec( commands := [ "LoadPackage( \"EigenGap\" );"]), scaffold := true, autodoc := rec( files := [ "doc/Intro.autodoc", "src/EigenGap.cc"] ) ) );
-
-PrintTo("PACKAGEVERSION", PackageInfo("EigenGap")[1].Version);
