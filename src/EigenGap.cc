@@ -10,9 +10,7 @@ using namespace std;
 
 #include <complex>
 
-extern "C" {
-#include "src/compiled.h"          /* GAP headers                */
-}
+#include "compiled.h"   // GAP headers
 
 
 
