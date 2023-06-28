@@ -15,6 +15,6 @@ echo "Installation attempted with GAP root directory: "
 echo $gap
 echo
 echo "If this is incorrect, please try again with the following flag: "
-echo "-g <path-to-GAP-root>
+echo "-g <path-to-GAP-root>"
 echo "(Refer to the documentation for more details)"
 echo
